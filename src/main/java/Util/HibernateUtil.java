@@ -12,6 +12,7 @@ public class HibernateUtil {
         try{
             return new Configuration()
                     .configure("hibernate.cfg.xml")
+                    .addAnnotatedClass(Entity.Product.class)
                     .buildSessionFactory();
         }catch(Exception e){
             e.printStackTrace();
