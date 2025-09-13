@@ -1,9 +1,8 @@
-import jakarta.persistence.*;
-import jdk.jfr.Category;
+package Entity;
 
-import java.util.function.Supplier;
+import jakarta.persistence.*;
 @Entity
-@Table (name = "Product")
+@Table (name = "Entity.Product")
 
 public class Product {
     @Id
