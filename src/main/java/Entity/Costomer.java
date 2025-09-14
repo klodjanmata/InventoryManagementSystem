@@ -5,11 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table (name = "Costumer")
+@Table (name = "Costomer")
 @AllArgsConstructor
 @NoArgsConstructor
 
-public class Costumer {
+public class Costomer {
 
     @Id
     @GeneratedValue (strategy = GenerationType.IDENTITY)

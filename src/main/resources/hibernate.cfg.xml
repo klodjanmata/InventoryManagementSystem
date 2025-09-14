@@ -12,12 +12,13 @@
         <property name="hibernate.show_sql">true</property>
         <property name="hibernate.format_sql">true</property>
 
-        <mapping class="Product"/>
-        <mapping class="Costumer"/>
-        <mapping class="Supplier"/>
-        <mapping class="Category"/>
-        <mapping class="Employees"/>
-
+        <mapping class="Entity.Product"/>
+        <mapping class="Entity.Costomer"/>
+        <mapping class="Entity.Supplier"/>
+        <mapping class="Entity.Category"/>
+        <mapping class="Entity.Employees"/>
+        <mapping class="Entity.Sales"/>
+        <mapping class="Entity.SaleItem"/>
 
 
     </session-factory>
