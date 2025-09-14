@@ -12,7 +12,13 @@
         <property name="hibernate.show_sql">true</property>
         <property name="hibernate.format_sql">true</property>
 
-        <mapping class="Entity.Product"/>
+        <mapping class="Product"/>
+        <mapping class="Costumer"/>
+        <mapping class="Supplier"/>
+        <mapping class="Category"/>
+        <mapping class="Employees"/>
+
+
 
     </session-factory>
 </hibernate-configuration>

@@ -1,8 +1,13 @@
 package Entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+
 @Entity
-@Table (name = "Entity.Product")
+@Table (name = "Product")
+@AllArgsConstructor
+@NoArgsConstructor
 
 public class Product {
     @Id
