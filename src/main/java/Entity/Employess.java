@@ -1,11 +1,15 @@
 package Entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
 
 @Entity
 @Table(name = "Employees")
+@Getter
+@Setter
 public class Employess {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
