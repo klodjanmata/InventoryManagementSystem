@@ -23,7 +23,7 @@ public class Sales {
     private Long id;
 
     @ManyToOne
-    private Costomer costomer;
+    private Customer costomer;
 
     private LocalDate saleDate;
     private double totalAmount;

@@ -1,8 +1,7 @@
 package Util;
 
-import Entity.Costomer;
-import Entity.Product;
-import Entity.Supplier;
+import Entity.Customer;
+import Entity.Employees;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.SessionFactory;
@@ -18,10 +17,10 @@ public class HibernateUtil {
             return new Configuration()
                     .configure("hibernate.cfg.xml")
                     .addAnnotatedClass(Entity.Product.class)
-                    .addAnnotatedClass(Entity.Costomer.class)
+                    .addAnnotatedClass(Customer.class)
                     .addAnnotatedClass(Entity.Supplier.class)
                     .addAnnotatedClass(Entity.Category.class)
-                    .addAnnotatedClass(Entity.Employess.class)
+                    .addAnnotatedClass(Employees.class)
                     .addAnnotatedClass(Entity.Sales.class)
                     .addAnnotatedClass(Entity.SaleItem.class)
                     .buildSessionFactory();

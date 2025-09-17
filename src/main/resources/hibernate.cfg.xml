@@ -13,7 +13,7 @@
         <property name="hibernate.format_sql">true</property>
 
         <mapping class="Entity.Product"/>
-        <mapping class="Entity.Costomer"/>
+        <mapping class="Entity.Customer"/>
         <mapping class="Entity.Supplier"/>
         <mapping class="Entity.Category"/>
         <mapping class="Entity.Employees"/>

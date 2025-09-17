@@ -2,14 +2,18 @@ package Entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
-@Table (name = "Costomer")
+@Table (name = "Customer")
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
+@Setter
 
-public class Costomer {
+public class Customer {
 
     @Id
     @GeneratedValue (strategy = GenerationType.IDENTITY)
