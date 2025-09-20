@@ -12,7 +12,10 @@ public class CustomerService {
         if (customerRepo.findByEmail(email) != null) {
             throw new RuntimeException("❌ Customer with this email already exists!");
         }
-        Customer customer = new Customer(0, name, email, phone); // id auto-generated
+        Customer customer = new Customer(); // id auto-generated
+        customer.setName(name);
+        customer.setPhone(phone);
+        customer.setEmail(email);
         customerRepo.save(customer);
         System.out.println("✅ Registered customer: " + customer.getName());
     }

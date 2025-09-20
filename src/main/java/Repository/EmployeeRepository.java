@@ -1,6 +1,6 @@
 package Repository;
 
-import Entity.Employees;
+import Entity.Employee;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import Util.HibernateUtil;
@@ -9,19 +9,19 @@ import java.util.List;
 
 public class EmployeeRepository {
 
-    public Employees findById(Long id) {
+    public Employee findById(Long id) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            return session.get(Employees.class, id);
+            return session.get(Employee.class, id);
         }
     }
 
-    public List<Employees> findAll() {
+    public List<Employee> findAll() {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            return session.createQuery("FROM Employees", Employees.class).list();
+            return session.createQuery("FROM Employee", Employee.class).list();
         }
     }
 
-    public void save(Employees employee) {
+    public void save(Employee employee) {
         Transaction tx = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             tx = session.beginTransaction();
@@ -32,7 +32,7 @@ public class EmployeeRepository {
         }
     }
 
-    public void update(Employees employee) {
+    public void update(Employee employee) {
         Transaction tx = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             tx = session.beginTransaction();
@@ -47,7 +47,7 @@ public class EmployeeRepository {
         Transaction tx = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             tx = session.beginTransaction();
-            Employees employee = session.get(Employees.class, id);
+            Employee employee = session.get(Employee.class, id);
             if (employee != null) {
                 session.remove(employee);
             }
@@ -57,9 +57,9 @@ public class EmployeeRepository {
         }
     }
 
-    public List<Employees> findByRole(String role) {
+    public List<Employee> findByRole(String role) {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            return session.createQuery("FROM Employees WHERE role = :role", Employees.class)
+            return session.createQuery("FROM Employee WHERE role = :role", Employee.class)
                     .setParameter("role", role)
                     .list();
         }

@@ -1,5 +1,8 @@
 
 
+import Repository.ProductRepository;
+import Repository.SaleRepository;
+import Repository.SupplierRepository;
 import Service.CustomerService;
 import Service.CategoryService;
 import Service.EmployeeService;
@@ -14,12 +17,16 @@ public class MainMenu {
     private static final Scanner scanner = new Scanner(System.in);
 
     public static void Menu() {
+        ProductRepository productRepository = new ProductRepository();
+        SupplierRepository supplierRepository = new SupplierRepository();
+        SaleRepository saleRepository = new SaleRepository();
+
         CustomerService customerService = new CustomerService();
         CategoryService categoryService = new CategoryService();
         EmployeeService employeeService = new EmployeeService();
-        ProductService productService = new ProductService();
-        SupplierService supplierService = new SupplierService();
-        SaleService saleService = new SaleService();
+        ProductService productService = new ProductService(productRepository);
+        SupplierService supplierService = new SupplierService(supplierRepository);
+        SaleService saleService = new SaleService(saleRepository);
 
         while (true) {
             System.out.println("\n=== Inventory Management System ===");

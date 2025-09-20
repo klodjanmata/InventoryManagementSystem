@@ -1,6 +1,8 @@
 package Repository;
 
-import Entity.Sales;
+import Entity.Sale;
+import Entity.Sale;
+import Util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -8,19 +10,12 @@ import org.hibernate.Transaction;
 import java.util.List;
 
 public class SaleRepository {
-
-    private final SessionFactory sessionFactory;
-
-    public SaleRepository(SessionFactory sessionFactory) {
-        this.sessionFactory = sessionFactory;
-    }
-
     // Save
-    public void save(Sales sales) {
+    public void save(Sale sale) {
         Transaction tx = null;
-        try (Session session = sessionFactory.openSession()) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             tx = session.beginTransaction();
-            session.persist(sales);
+            session.persist(sale);
             tx.commit();
         } catch (Exception e) {
             if (tx != null) tx.rollback();
@@ -29,11 +24,11 @@ public class SaleRepository {
     }
 
     // Update
-    public void update(Sales sales) {
+    public void update(Sale sale) {
         Transaction tx = null;
-        try (Session session = sessionFactory.openSession()) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             tx = session.beginTransaction();
-            session.merge(sales);
+            session.merge(sale);
             tx.commit();
         } catch (Exception e) {
             if (tx != null) tx.rollback();
@@ -42,11 +37,11 @@ public class SaleRepository {
     }
 
     // Delete
-    public void delete(Sales sales) {
+    public void delete(Sale sale) {
         Transaction tx = null;
-        try (Session session = sessionFactory.openSession()) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             tx = session.beginTransaction();
-            session.remove(sales);
+            session.remove(sale);
             tx.commit();
         } catch (Exception e) {
             if (tx != null) tx.rollback();
@@ -55,16 +50,16 @@ public class SaleRepository {
     }
 
     // Find by ID
-    public Sales findById(Long id) {
-        try (Session session = sessionFactory.openSession()) {
-            return session.get(Sales.class, id);
+    public Sale findById(Long id) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            return session.get(Sale.class, id);
         }
     }
 
     // Get all
-    public List<Sales> findAll() {
-        try (Session session = sessionFactory.openSession()) {
-            return session.createQuery("from Sales", Sales.class).list();
+    public List<Sale> findAll() {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            return session.createQuery("from Sale", Sale.class).list();
         }
     }
 }

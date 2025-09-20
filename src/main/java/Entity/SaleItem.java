@@ -9,7 +9,7 @@ import lombok.Setter;
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "sale_items")
+@Table(name = "sale_item")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -21,13 +21,14 @@ public class SaleItem {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "Sale_id")
-    private Sales sales;
+    @JoinColumn(name = "sale_id")
+    private Sale sale;
 
     @ManyToOne
-    @JoinColumn(name = "Product_id")
     private Product product;
 
+    @Column(name = "quantity")
     private Integer quantity;
+    @Column(name = "price")
     private BigDecimal price;
 }

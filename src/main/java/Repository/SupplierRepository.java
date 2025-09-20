@@ -1,6 +1,7 @@
 package Repository;
 
 import Entity.Supplier;
+import Util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -9,16 +10,10 @@ import java.util.List;
 
 public class SupplierRepository {
 
-    private final SessionFactory sessionFactory;
-
-    public SupplierRepository(SessionFactory sessionFactory) {
-        this.sessionFactory = sessionFactory;
-    }
-
     // Save
     public void save(Supplier supplier) {
         Transaction tx = null;
-        try (Session session = sessionFactory.openSession()) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             tx = session.beginTransaction();
             session.persist(supplier);
             tx.commit();
@@ -31,7 +26,7 @@ public class SupplierRepository {
     // Update
     public void update(Supplier supplier) {
         Transaction tx = null;
-        try (Session session = sessionFactory.openSession()) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             tx = session.beginTransaction();
             session.merge(supplier);
             tx.commit();
@@ -44,7 +39,7 @@ public class SupplierRepository {
     // Delete
     public void delete(Supplier supplier) {
         Transaction tx = null;
-        try (Session session = sessionFactory.openSession()) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             tx = session.beginTransaction();
             session.remove(supplier);
             tx.commit();
@@ -56,14 +51,14 @@ public class SupplierRepository {
 
     // Find by ID
     public Supplier findById(int id) {
-        try (Session session = sessionFactory.openSession()) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             return session.get(Supplier.class, id);
         }
     }
 
     // Get all suppliers
     public List<Supplier> findAll() {
-        try (Session session = sessionFactory.openSession()) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             return session.createQuery("from Supplier", Supplier.class).list();
         }
     }

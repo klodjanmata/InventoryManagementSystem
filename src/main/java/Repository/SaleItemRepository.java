@@ -1,6 +1,7 @@
 package Repository;
 
 import Entity.SaleItem;
+import Util.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -8,17 +9,10 @@ import org.hibernate.Transaction;
 import java.util.List;
 
 public class SaleItemRepository {
-
-    private final SessionFactory sessionFactory;
-
-    public SaleItemRepository(SessionFactory sessionFactory) {
-        this.sessionFactory = sessionFactory;
-    }
-
     // Save
     public void save(SaleItem saleItem) {
         Transaction tx = null;
-        try (Session session = sessionFactory.openSession()) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             tx = session.beginTransaction();
             session.persist(saleItem);
             tx.commit();
@@ -31,7 +25,7 @@ public class SaleItemRepository {
     // Update
     public void update(SaleItem saleItem) {
         Transaction tx = null;
-        try (Session session = sessionFactory.openSession()) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             tx = session.beginTransaction();
             session.merge(saleItem);
             tx.commit();
@@ -44,7 +38,7 @@ public class SaleItemRepository {
     // Delete
     public void delete(SaleItem saleItem) {
         Transaction tx = null;
-        try (Session session = sessionFactory.openSession()) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             tx = session.beginTransaction();
             session.remove(saleItem);
             tx.commit();
@@ -56,14 +50,14 @@ public class SaleItemRepository {
 
     // Find by ID
     public SaleItem findById(Long id) {
-        try (Session session = sessionFactory.openSession()) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             return session.get(SaleItem.class, id);
         }
     }
 
     // Get all SaleItems
     public List<SaleItem> findAll() {
-        try (Session session = sessionFactory.openSession()) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             return session.createQuery("from SaleItem", SaleItem.class).list();
         }
     }

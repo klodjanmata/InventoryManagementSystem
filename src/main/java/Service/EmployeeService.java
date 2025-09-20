@@ -1,6 +1,6 @@
 package Service;
 
-import Entity.Employees;
+import Entity.Employee;
 import Repository.EmployeeRepository;
 
 import java.time.LocalDate;
@@ -10,7 +10,7 @@ public class EmployeeService {
     private final EmployeeRepository employeeRepo = new EmployeeRepository();
 
     public void hireEmployee(String name, String role) {
-        Employees emp = new Employees();
+        Employee emp = new Employee();
         emp.setName(name);
         emp.setRole(role);
         emp.setHireDate(LocalDate.now()); // hire date is today by default
@@ -18,19 +18,19 @@ public class EmployeeService {
         System.out.println("✅ Hired employee: " + emp.getName());
     }
 
-    public Employees getEmployee(Long id) {
+    public Employee getEmployee(Long id) {
         return employeeRepo.findById(id);
     }
 
-    public List<Employees> listEmployees() {
+    public List<Employee> listEmployee() {
         return employeeRepo.findAll();
     }
 
-    public List<Employees> listByRole(String role) {
+    public List<Employee> listByRole(String role) {
         return employeeRepo.findByRole(role);
     }
 
-    public void updateEmployee(Employees emp) {
+    public void updateEmployee(Employee emp) {
         employeeRepo.update(emp);
     }
 

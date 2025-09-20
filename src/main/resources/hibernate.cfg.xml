@@ -8,7 +8,7 @@
         <property name="connection.username">root</property>
         <property name="connection.password">root</property>
         <property name="dialect">org.hibernate.dialect.MySQLDialect</property>
-        <property name="hbm2ddl.auto">create-drop</property>
+        <property name="hbm2ddl.auto">update</property>
         <property name="hibernate.show_sql">true</property>
         <property name="hibernate.format_sql">true</property>
 
@@ -16,8 +16,8 @@
         <mapping class="Entity.Customer"/>
         <mapping class="Entity.Supplier"/>
         <mapping class="Entity.Category"/>
-        <mapping class="Entity.Employees"/>
-        <mapping class="Entity.Sales"/>
+        <mapping class="Entity.Employee"/>
+        <mapping class="Entity.Sale"/>
         <mapping class="Entity.SaleItem"/>
 
 

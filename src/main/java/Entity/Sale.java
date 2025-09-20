@@ -17,12 +17,12 @@ import java.util.List;
 @Getter
 @Setter
 
-public class Sales {
+public class Sale {
     @Id
     @GeneratedValue
     private Long id;
 
-    @ManyToOne
+    @OneToOne
     private Customer customer;
 
     @Column
@@ -31,7 +31,7 @@ public class Sales {
     @Column
     private double totalAmount;
 
-    @OneToMany(mappedBy = "sale", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "sale")
     private List<SaleItem> items = new ArrayList<>();
 
 

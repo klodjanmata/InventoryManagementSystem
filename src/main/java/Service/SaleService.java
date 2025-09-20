@@ -1,35 +1,35 @@
 package Service;
 
-import Entity.Sales;
+import Entity.Sale;
 import Repository.SaleRepository;
 
 import java.util.List;
 
 public class SaleService {
 
-    private final SaleRepository salesRepository;
+    private final SaleRepository saleRepository;
 
-    public SaleService(SaleRepository salesRepository) {
-        this.salesRepository = salesRepository;
+    public SaleService(SaleRepository saleRepository) {
+        this.saleRepository = saleRepository;
     }
 
-    public void addSales(Sales sales) {
-        salesRepository.save(sales);
+    public void addSale(Sale sale) {
+        saleRepository.save(sale);
     }
 
-    public void updateSales(Sales sales) {
-        salesRepository.update(sales);
+    public void updateSale(Sale sale) {
+        saleRepository.update(sale);
     }
 
-    public void deleteSales(Sales sales) {
-        salesRepository.delete(sales);
+    public void deleteSale(Sale sale) {
+        saleRepository.delete(sale);
     }
 
-    public Sales getSalesById(Long id) {
-        return salesRepository.findById(id);
+    public Sale getSaleById(Long id) {
+        return saleRepository.findById(id);
     }
 
-    public List<Sales> getAllSales() {
-        return salesRepository.findAll();
+    public List<Sale> getAllSale() {
+        return saleRepository.findAll();
     }
 }

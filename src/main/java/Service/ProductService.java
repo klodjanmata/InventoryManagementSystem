@@ -8,6 +8,7 @@ import java.util.List;
 
 public class ProductService {
 
+    private ProductRepository productRepository;
     private List<String> clientsMap;
 
     public ProductService(ProductRepository productRepository) {

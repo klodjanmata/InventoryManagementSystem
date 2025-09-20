@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Entity
 @Table (name = "Customer")
 @AllArgsConstructor
@@ -19,16 +21,13 @@ public class Customer {
     @GeneratedValue (strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "Name")
+    @Column(name = "name")
     private String name;
 
-    @Column(name = "Email")
+    @Column(name = "email")
     private String email;
 
-    @Column(name = "Phone")
+    @Column(name = "phone")
     private String phone;
-
-    @OneToMany
-    private Sales sales;
 
 }
