@@ -23,10 +23,14 @@ public class Sales {
     private Long id;
 
     @ManyToOne
-    private Customer costomer;
+    private Customer customer;
 
+    @Column
     private LocalDate saleDate;
+
+    @Column
     private double totalAmount;
+
     @OneToMany(mappedBy = "sale", cascade = CascadeType.ALL)
     private List<SaleItem> items = new ArrayList<>();
 

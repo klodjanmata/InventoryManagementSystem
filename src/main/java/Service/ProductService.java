@@ -3,11 +3,12 @@ package Service;
 import Entity.Product;
 import Repository.ProductRepository;
 
+import java.util.HashMap;
 import java.util.List;
 
 public class ProductService {
 
-    private final ProductRepository productRepository;
+    private List<String> clientsMap;
 
     public ProductService(ProductRepository productRepository) {
         this.productRepository = productRepository;

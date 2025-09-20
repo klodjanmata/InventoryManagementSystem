@@ -19,9 +19,16 @@ public class Customer {
     @GeneratedValue (strategy = GenerationType.IDENTITY)
     private int id;
 
-
+    @Column(name = "Name")
     private String name;
+
+    @Column(name = "Email")
     private String email;
+
+    @Column(name = "Phone")
     private String phone;
+
+    @OneToMany
+    private Sales sales;
 
 }

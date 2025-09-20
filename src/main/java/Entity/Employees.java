@@ -15,7 +15,10 @@ public class Employees {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "Name")
     private String name;
+
+    @Column(name = "Role")
     private String role;
 
     @Column(name = "hire_date")

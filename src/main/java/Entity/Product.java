@@ -18,8 +18,13 @@ public class Product {
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         private int id;
 
+        @Column(name = "Name")
         private String name;
+
+        @Column(name = "Price")
         private double price;
+
+        @Column(name = "Stock")
         private int stock;
 
         @ManyToOne
