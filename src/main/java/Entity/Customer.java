@@ -30,4 +30,9 @@ public class Customer {
     @Column(name = "phone")
     private String phone;
 
+
+    @Override
+    public String toString() {
+        return id + "\t" + name + "\t" + email +  "\t" + phone;
+    }
 }
