@@ -12,7 +12,7 @@ public class ProductService {
 
     private ProductRepository productRepository = new ProductRepository();
 
-    public ProductService(ProductRepository productRepository) {
+    public ProductService() {
         this.productRepository = productRepository;
     }
 

@@ -7,10 +7,10 @@ import java.util.List;
 
 public class SaleService {
 
-    private final SaleRepository saleRepository;
+    private final SaleRepository saleRepository = new SaleRepository();
 
-    public SaleService(SaleRepository saleRepository) {
-        this.saleRepository = saleRepository;
+    public SaleService() {
+
     }
 
     public void addSale(Sale sale) {

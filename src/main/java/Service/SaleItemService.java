@@ -7,10 +7,9 @@ import java.util.List;
 
 public class SaleItemService {
 
-    private final SaleItemRepository saleItemRepository;
+    private final SaleItemRepository saleItemRepository = new SaleItemRepository();
 
-    public SaleItemService(SaleItemRepository saleItemRepository) {
-        this.saleItemRepository = saleItemRepository;
+    public SaleItemService() {
     }
 
     public void addSaleItem(SaleItem saleItem) {

@@ -1,6 +1,4 @@
-import Repository.ProductRepository;
-import Repository.SaleRepository;
-import Repository.SupplierRepository;
+import Repository.*;
 import Service.*;
 import Util.Helper;
 
@@ -11,6 +9,10 @@ public class Application {
     private ProductRepository productRepository;
     private SupplierRepository supplierRepository;
     private SaleRepository saleRepository;
+    private CategoryRepository categoryRepository;
+    private CustomerRepository customerRepository;
+    private EmployeeRepository employeeRepository;
+    private SaleItemRepository saleItemRepository;
 
     private CustomerService customerService;
     private CategoryService categoryService;
@@ -18,18 +20,24 @@ public class Application {
     private ProductService productService;
     private SupplierService supplierService;
     private SaleService saleService;
+    private SaleItemService saleItemService;
 
     public Application() {
         productRepository = new ProductRepository();
         supplierRepository = new SupplierRepository();
         saleRepository = new SaleRepository();
+        customerRepository = new CustomerRepository();
+        categoryRepository = new CategoryRepository();
+        employeeRepository = new EmployeeRepository();
+        saleItemRepository = new SaleItemRepository();
 
         customerService = new CustomerService();
         categoryService = new CategoryService();
         employeeService = new EmployeeService();
-        productService = new ProductService(productRepository);
+        productService = new ProductService();
         supplierService = new SupplierService();
-        saleService = new SaleService(saleRepository);
+        saleService = new SaleService();
+        saleItemService = new SaleItemService();
     }
 
 
