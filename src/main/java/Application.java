@@ -5,6 +5,9 @@ import Service.*;
 import Util.Helper;
 
 public class Application {
+
+    private static ApplicationManager applicationManager = new ApplicationManager();
+
     private ProductRepository productRepository;
     private SupplierRepository supplierRepository;
     private SaleRepository saleRepository;
@@ -56,10 +59,14 @@ public class Application {
     private static boolean manageAction(int choice, Application application){
         switch (choice){
             case 1:
-                application.customerService.registerCustomer();
+                Menu.customerMenu();
+                int customerChoice = getChoice();
+                applicationManager.customerMenuSelection(customerChoice);
                 break;
             case 2:
-                application.customerService.printAllCustomers();
+                Menu.categoryMenu();
+                int categoryChoice = getChoice();
+                applicationManager.categoryMenuSelection(categoryChoice);
                 break;
             case 3:
                 application.categoryService.addCategory();
