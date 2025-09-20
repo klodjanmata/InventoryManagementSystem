@@ -2,6 +2,8 @@ package Util;
 
 import Entity.Category;
 import Entity.Customer;
+import Entity.Employee;
+import Entity.Supplier;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +18,15 @@ public class Printer {
         return "ID\tName\tDescription";
     }
 
+    public static String employeeHeader(){
+        return "ID\tName\tRole\tHire Date";
+    }
+
+    public static String supplierHeader(){
+        return "ID\tName\tContact\tEmail";
+    }
+
+
 
     public static void printCustomers(List<Customer> customers) {
         System.out.println(customerHeader());
@@ -28,6 +39,20 @@ public class Printer {
         System.out.println(categoryHeader());
         for (Category category : categories){
             System.out.println(category);
+        }
+    }
+
+    public static void printEmployees(List<Employee> employees){
+        System.out.println(employeeHeader());
+        for (Employee employee : employees){
+            System.out.println(employee);
+        }
+    }
+
+    public static void printSuppliers(List<Supplier> suppliers){
+        System.out.println(supplierHeader());
+        for (Supplier supplier : suppliers){
+            System.out.println(supplier);
         }
     }
 }

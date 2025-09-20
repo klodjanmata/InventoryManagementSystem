@@ -34,7 +34,7 @@ public class ApplicationManager {
         saleRepository = new SaleRepository();
         saleService = new SaleService(saleRepository);
         supplierRepository = new SupplierRepository();
-        supplierService = new SupplierService(supplierRepository);
+        supplierService = new SupplierService();
 
     }
 
@@ -50,7 +50,7 @@ public class ApplicationManager {
                 break;
 
             default:
-                System.out.println("Unsupported filter choice! Try again!");
+                System.out.println("Unsupported choice! Try again!");
                 break;
 
 
@@ -71,13 +71,60 @@ public class ApplicationManager {
                 break;
 
             default:
-                System.out.println("Unsupported filter choice! Try again!");
+                System.out.println("Unsupported choice! Try again!");
                 break;
 
 
         }
 
     }
+
+    public void employeeMenuSelection(int choice){
+    switch (choice){
+        case 1:
+            employeeService.hireEmployee();
+            break;
+
+        case 2:
+            employeeService.printAllEmployees();
+            break;
+        default:
+            System.out.println("Unsupported choice! Try again!");
+            break;
+        }
+    }
+
+//    public void productMenuSelection(int choice){
+//        switch (choice){
+//            case 1:
+//                productService.hireEmployee();
+//                break;
+//
+//            case 2:
+//                productService.printAllEmployees();
+//                break;
+//            default:
+//                System.out.println("Unsupported choice! Try again!");
+//                break;
+//        }
+//    }
+
+    public void supplierMenuSelection(int choice){
+        switch (choice){
+            case 1:
+                supplierService.addSupplier();
+                break;
+
+            case 2:
+                supplierService.printAllSuppliers();
+                break;
+
+            default:
+                System.out.println("Unsupported choice! Try again!");
+                break;
+        }
+    }
+
 }
 
 

@@ -26,6 +26,9 @@ public class Supplier {
     @Column(name = "email")
     private String email;
 
-
+    @Override
+    public String toString() {
+        return id + "\t" + name + "\t" + contact +  "\t" + email;
+    }
 
 }

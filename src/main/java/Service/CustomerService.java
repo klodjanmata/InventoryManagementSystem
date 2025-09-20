@@ -12,7 +12,7 @@ public class CustomerService {
 
     public void registerCustomer() {
         Customer customer = new Customer();
-        System.out.println("Provide neccessary parameters");
+        System.out.println("Provide necessary parameters");
         customer.setName(Helper.getStringFromUser("Enter Customer Name"));
         customer.setPhone(Helper.getStringFromUser("Enter Customer Phone"));
         customer.setEmail(Helper.getStringFromUser("Enter Customer Email"));

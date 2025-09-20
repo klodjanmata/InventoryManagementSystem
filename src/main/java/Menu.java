@@ -1,7 +1,7 @@
 public class Menu {
 
     public static void mainMenu() {
-        System.out.println("\n=== Inventory Management System ===");
+        System.out.println("\n=== Inventory Management System === \n\t\t*** MAIN MENU ***");
         System.out.println("1. Customer");
         System.out.println("2. Category");
         System.out.println("3. Employee");
@@ -12,17 +12,40 @@ public class Menu {
 
     }
 
-    public static void customerMenu(){
+    public static void customerMenu() {
         System.out.println("1. Add Customer");
-        System.out.println("2. List All Customer");
+        System.out.println("2. List All Customers");
         System.out.println("3. Edit Customer");
         System.out.println("4. Delete Customer");
     }
 
-    public static void categoryMenu(){
+    public static void categoryMenu() {
         System.out.println("1. Add Category");
         System.out.println("2. List All Categories");
         System.out.println("3. Edit Category");
         System.out.println("4. Delete Category");
     }
+
+    public static void employeeMenu() {
+        System.out.println("1. Add Employee");
+        System.out.println("2. List All Employees");
+        System.out.println("3. Edit Employee");
+        System.out.println("4. Delete Employee");
+    }
+
+    public static void productMenu() {
+        System.out.println("1. Add Product");
+        System.out.println("2. List All Products");
+        System.out.println("3. Edit Product");
+        System.out.println("4. Delete Product");
+    }
+
+    public static void supplierMenu() {
+        System.out.println("1. Add Supplier");
+        System.out.println("2. List All Suppliers");
+        System.out.println("3. Edit Supplier");
+        System.out.println("4. Delete Supplier");
+    }
+
+
 }

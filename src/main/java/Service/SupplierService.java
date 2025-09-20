@@ -2,19 +2,24 @@ package Service;
 
 import Entity.Supplier;
 import Repository.SupplierRepository;
+import Util.Helper;
+import Util.Printer;
 
 import java.util.List;
 
 public class SupplierService {
 
-    private final SupplierRepository supplierRepository;
+    private final SupplierRepository supplierRepository = new SupplierRepository();
 
-    public SupplierService(SupplierRepository supplierRepository) {
-        this.supplierRepository = supplierRepository;
-    }
-
-    public void addSupplier(Supplier supplier) {
+    public void addSupplier() {
+        Supplier supplier = new Supplier();
+        System.out.println("Provide necessary parameters");
+        supplier.setName(Helper.getStringFromUser("Enter Supplier Name"));
+        supplier.setContact(Helper.getStringFromUser("Enter Supplier Contact"));
+        supplier.setEmail(Helper.getStringFromUser("Enter Supplier Email"));
         supplierRepository.save(supplier);
+        System.out.println("✅ Registered supplier: " + supplier.getName());
+
     }
 
     public void updateSupplier(Supplier supplier) {
@@ -29,7 +34,9 @@ public class SupplierService {
         return supplierRepository.findById(id);
     }
 
-    public List<Supplier> getAllSuppliers() {
-        return supplierRepository.findAll();
+    public void printAllSuppliers() {
+        List<Supplier> suppliers = supplierRepository.findAll();
+        Printer.printSuppliers(suppliers);
+
     }
 }

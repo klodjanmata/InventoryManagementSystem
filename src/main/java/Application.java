@@ -28,7 +28,7 @@ public class Application {
         categoryService = new CategoryService();
         employeeService = new EmployeeService();
         productService = new ProductService(productRepository);
-        supplierService = new SupplierService(supplierRepository);
+        supplierService = new SupplierService();
         saleService = new SaleService(saleRepository);
     }
 
@@ -63,17 +63,31 @@ public class Application {
                 int customerChoice = getChoice();
                 applicationManager.customerMenuSelection(customerChoice);
                 break;
+
             case 2:
                 Menu.categoryMenu();
                 int categoryChoice = getChoice();
                 applicationManager.categoryMenuSelection(categoryChoice);
                 break;
+
             case 3:
-                application.categoryService.addCategory();
+                Menu.employeeMenu();
+                int employeeChoice = getChoice();
+                applicationManager.employeeMenuSelection(employeeChoice);
                 break;
+
             case 4:
-                application.categoryService.printAllCategories();
+                Menu.productMenu();
+                int productChoice = getChoice();
+                //applicationManager.productMenuSelection(productChoice);
                 break;
+
+            case 6:
+                Menu.supplierMenu();
+                int supplierChoice = getChoice();
+                applicationManager.supplierMenuSelection(supplierChoice);
+                break;
+
             case 0:
                 return true;
             default:

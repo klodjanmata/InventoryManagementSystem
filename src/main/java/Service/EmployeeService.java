@@ -2,6 +2,8 @@ package Service;
 
 import Entity.Employee;
 import Repository.EmployeeRepository;
+import Util.Helper;
+import Util.Printer;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -9,21 +11,23 @@ import java.util.List;
 public class EmployeeService {
     private final EmployeeRepository employeeRepo = new EmployeeRepository();
 
-    public void hireEmployee(String name, String role) {
-        Employee emp = new Employee();
-        emp.setName(name);
-        emp.setRole(role);
-        emp.setHireDate(LocalDate.now()); // hire date is today by default
-        employeeRepo.save(emp);
-        System.out.println("✅ Hired employee: " + emp.getName());
+    public void hireEmployee() {
+        Employee employee = new Employee();
+        System.out.println("Provide necessary parameters");
+        employee.setName(Helper.getStringFromUser("Enter Employee Name"));
+        employee.setRole(Helper.getStringFromUser("Enter Employee Role"));
+        employee.setHireDate(Helper.getLocalDateFromUser("Enter Hire Date"));
+        employeeRepo.save(employee);
+        System.out.println("✅ Hired employee: " + employee.getName());
     }
 
     public Employee getEmployee(Long id) {
         return employeeRepo.findById(id);
     }
 
-    public List<Employee> listEmployee() {
-        return employeeRepo.findAll();
+    public void printAllEmployees() {
+        List<Employee> employees = employeeRepo.findAll();
+        Printer.printEmployees(employees);
     }
 
     public List<Employee> listByRole(String role) {

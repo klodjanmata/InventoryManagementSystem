@@ -27,4 +27,9 @@ public class Employee {
 
     @Column(name = "hire_date")
     private LocalDate hireDate;
+
+    @Override
+    public String toString() {
+        return id + "\t" + name + "\t" + role +  "\t" + hireDate;
+    }
 }
