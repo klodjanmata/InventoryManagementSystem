@@ -22,4 +22,9 @@ public class Category {
     private String description;
 
 
+    @Override
+    public String toString() {
+        return id + "\t" + name + "\t" + description;
+    }
+
 }

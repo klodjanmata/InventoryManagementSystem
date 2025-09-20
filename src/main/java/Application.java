@@ -61,6 +61,12 @@ public class Application {
             case 2:
                 application.customerService.printAllCustomers();
                 break;
+            case 3:
+                application.categoryService.addCategory();
+                break;
+            case 4:
+                application.categoryService.printAllCategories();
+                break;
             case 0:
                 return true;
             default:

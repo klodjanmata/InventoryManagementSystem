@@ -2,19 +2,30 @@ package Service;
 
 import Entity.Category;
 import Repository.CategoryRepository;
+import Util.Helper;
+import Util.Printer;
 
 import java.util.List;
 
 public class CategoryService {
     private final CategoryRepository categoryRepo = new CategoryRepository();
 
-    public void addCategory(String name, String description) {
-        if (categoryRepo.findByName(name) != null) {
-            throw new RuntimeException("❌ Category with this name already exists!");
+    public void addCategory() {
+
+        Category category = new Category();
+        category.setName(Helper.getStringFromUser("Category Name"));
+        if (categoryRepo.findByName(category.getName()) != null) {
+            System.out.println("❌ Category with this name already exists!");
+            return;
         }
-        Category category = new Category(null, name, description);
+        category.setDescription(Helper.getStringFromUser("Category Description"));
         categoryRepo.save(category);
         System.out.println("✅ Added category: " + category.getName());
+    }
+
+    public void printAllCategories(){
+        List<Category> categories = categoryRepo.findAll();
+        Printer.printCategories(categories);
     }
 
     public Category getCategory(Long id) {
