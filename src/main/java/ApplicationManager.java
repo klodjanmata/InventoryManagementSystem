@@ -52,6 +52,14 @@ public class ApplicationManager {
 
             case 3:
                 customerService.updateCustomer();
+                break;
+
+            case 4:
+                customerService.deleteCustomer();
+                break;
+
+            case 0:
+                return;
 
             default:
                 System.out.println("Unsupported choice! Try again!");
@@ -74,6 +82,17 @@ public class ApplicationManager {
                 categoryService.printAllCategories();
                 break;
 
+            case 3:
+                categoryService.updateCategory();
+                break;
+
+            case 4:
+                categoryService.deleteCategory();
+                break;
+
+            case 0:
+                return;
+
             default:
                 System.out.println("Unsupported choice! Try again!");
                 break;
@@ -94,26 +113,42 @@ public class ApplicationManager {
         case 2:
             employeeService.printAllEmployees();
             break;
+
+        case 3:
+            employeeService.updateEmployee();
+            break;
+
+        case 4:
+            employeeService.fireEmployee();
+            break;
+
+        case 0:
+            return;
+
         default:
             System.out.println("Unsupported choice! Try again!");
             break;
         }
     }
 
-//    public void productMenuSelection(int choice){
-//        switch (choice){
-//            case 1:
-//                productService.hireEmployee();
-//                break;
-//
-//            case 2:
-//                productService.printAllEmployees();
-//                break;
-//            default:
-//                System.out.println("Unsupported choice! Try again!");
-//                break;
-//        }
-//    }
+    public void productMenuSelection(int choice){
+        switch (choice){
+            case 1:
+                productService.addProduct();
+                break;
+
+            case 2:
+                productService.getAllProducts();
+                break;
+
+            case 0:
+                return;
+
+            default:
+                System.out.println("Unsupported choice! Try again!");
+                break;
+        }
+    }
 
     public void supplierMenuSelection(int choice){
         switch (choice){
@@ -124,6 +159,17 @@ public class ApplicationManager {
             case 2:
                 supplierService.printAllSuppliers();
                 break;
+
+            case 3:
+                supplierService.updateSupplier();
+                break;
+
+            case 4:
+                supplierService.deleteSupplier();
+                break;
+
+            case 0:
+                return;
 
             default:
                 System.out.println("Unsupported choice! Try again!");

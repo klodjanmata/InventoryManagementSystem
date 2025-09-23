@@ -67,8 +67,21 @@ public class CustomerService {
     }
 
 
-    public void deleteCustomer(int id) {
-        customerRepo.delete(id);
+    public void deleteCustomer() {
+        Customer customer = new Customer();
+        System.out.println("🗑️ Delete Customer");
+        printAllCustomers();
+        int customerId = Helper.getIntFromUser("Enter Customer ID to delete");
+
+        Optional<Customer> optionalCustomer = Optional.ofNullable(customerRepo.findById(customerId));
+
+        if (optionalCustomer.isPresent()) {
+            customer = optionalCustomer.get();
+            customerRepo.delete(customerId);
+            System.out.println("✅ Customer with ID " + customerId + "-" + customer.getName() + " has been deleted.");
+        } else {
+            System.out.println("❌ No customer found with ID " + customerId);
+        }
     }
 }
 

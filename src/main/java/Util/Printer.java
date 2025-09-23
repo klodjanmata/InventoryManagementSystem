@@ -1,9 +1,6 @@
 package Util;
 
-import Entity.Category;
-import Entity.Customer;
-import Entity.Employee;
-import Entity.Supplier;
+import Entity.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,9 +19,15 @@ public class Printer {
         return "ID\tName\tRole\tHire Date";
     }
 
+    public static String productHeader(){
+        return "ID\tName\tPrice\tStock\tSupplier\tCategory";
+    }
+
     public static String supplierHeader(){
         return "ID\tName\tContact\tEmail";
     }
+
+
 
 
 
@@ -46,6 +49,13 @@ public class Printer {
         System.out.println(employeeHeader());
         for (Employee employee : employees){
             System.out.println(employee);
+        }
+    }
+
+    public static void printProducts(List<Product> products){
+        System.out.println(productHeader());
+        for (Product product : products){
+            System.out.println(product);
         }
     }
 

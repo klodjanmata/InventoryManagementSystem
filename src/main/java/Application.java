@@ -87,7 +87,7 @@ public class Application {
             case 4:
                 Menu.productMenu();
                 int productChoice = getChoice();
-                //applicationManager.productMenuSelection(productChoice);
+                applicationManager.productMenuSelection(productChoice);
                 break;
 
             case 6:

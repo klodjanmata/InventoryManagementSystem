@@ -33,5 +33,10 @@ public class Product {
     @OneToOne
     private Category category;
 
+    @Override
+    public String toString() {
+        return STR."\{id}\t\{name}\t\{price}\t\{stock}\t\{supplier.getName()}\t\{category.getName()}";
+        }
+
     }
 

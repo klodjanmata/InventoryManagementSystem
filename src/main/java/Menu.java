@@ -2,12 +2,12 @@ public class Menu {
 
     public static void mainMenu() {
         System.out.println("\n=== Inventory Management System === \n\t\t*** MAIN MENU ***");
-        System.out.println("1. Customer");
-        System.out.println("2. Category");
-        System.out.println("3. Employee");
-        System.out.println("4. Product");
-        System.out.println("5. Sale");
-        System.out.println("6. Supplier");
+        System.out.println("1. Customer Menu");
+        System.out.println("2. Category Menu");
+        System.out.println("3. Employee Menu");
+        System.out.println("4. Product Menu");
+        System.out.println("5. Sales Menu");
+        System.out.println("6. Supplier Menu");
         System.out.println("0. Exit");
 
     }
@@ -17,6 +17,7 @@ public class Menu {
         System.out.println("2. List All Customers");
         System.out.println("3. Edit Customer");
         System.out.println("4. Delete Customer");
+        System.out.println("0. Back");
     }
 
     public static void categoryMenu() {
@@ -24,6 +25,7 @@ public class Menu {
         System.out.println("2. List All Categories");
         System.out.println("3. Edit Category");
         System.out.println("4. Delete Category");
+        System.out.println("0. Back");
     }
 
     public static void employeeMenu() {
@@ -31,6 +33,7 @@ public class Menu {
         System.out.println("2. List All Employees");
         System.out.println("3. Edit Employee");
         System.out.println("4. Delete Employee");
+        System.out.println("0. Back");
     }
 
     public static void productMenu() {
@@ -38,6 +41,7 @@ public class Menu {
         System.out.println("2. List All Products");
         System.out.println("3. Edit Product");
         System.out.println("4. Delete Product");
+        System.out.println("0. Back");
     }
 
     public static void supplierMenu() {
@@ -45,6 +49,7 @@ public class Menu {
         System.out.println("2. List All Suppliers");
         System.out.println("3. Edit Supplier");
         System.out.println("4. Delete Supplier");
+        System.out.println("0. Back");
     }
 
 
