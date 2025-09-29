@@ -1,5 +1,6 @@
 package Util;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -106,6 +107,21 @@ public class Helper {
             }
         }
     }
+
+    public static BigDecimal getBigDecimalFromUser(String message) {
+        System.out.print(message + ": ");
+        Scanner sc = new Scanner(System.in);
+        while (true) {
+            String input = sc.nextLine().trim();
+            try {
+                // Parse directly into BigDecimal (avoids double precision issues)
+                return new BigDecimal(input);
+            } catch (NumberFormatException e) {
+                System.out.print("❌ Invalid number. Please enter a valid decimal value: ");
+            }
+        }
+    }
+
 
 
 

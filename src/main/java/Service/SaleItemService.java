@@ -1,34 +1,67 @@
 package Service;
 
+import Entity.Product;
+import Entity.Sale;
 import Entity.SaleItem;
+import Repository.ProductRepository;
 import Repository.SaleItemRepository;
-
+import java.math.BigDecimal;
 import java.util.List;
 
 public class SaleItemService {
 
-    private final SaleItemRepository saleItemRepository = new SaleItemRepository();
+    private final SaleItemRepository saleItemRepository;
+    private final ProductRepository productRepository;
 
-    public SaleItemService() {
+    public SaleItemService(SaleItemRepository saleItemRepository, ProductRepository productRepository) {
+        this.saleItemRepository = saleItemRepository;
+        this.productRepository = productRepository;
     }
 
-    public void addSaleItem(SaleItem saleItem) {
-        saleItemRepository.save(saleItem);
+    // ✅ Add item to sale with stock validation
+    public boolean addItemToSale(Sale sale, Product product, int quantity) {
+        if (quantity <= 0 || quantity > product.getStock()) {
+            System.out.println("❌ Invalid quantity. Available stock: " + product.getStock());
+            return false;
+        }
+
+        SaleItem item = new SaleItem();
+        item.setSale(sale);
+        item.setProduct(product);
+        item.setQuantity(quantity);
+        item.setPrice(product.getPrice());
+
+        sale.getItems().add(item);
+        product.setStock(product.getStock() - quantity);
+
+        productRepository.update(product);
+
+        System.out.println("✅ Item added: " + product.getName() + " x" + quantity);
+        return true;
     }
 
-    public void updateSaleItem(SaleItem saleItem) {
-        saleItemRepository.update(saleItem);
+    // 🧮 Calculate subtotal
+    public BigDecimal calculateSubtotal(SaleItem item) {
+        return item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity()));
     }
 
-    public void deleteSaleItem(SaleItem saleItem) {
-        saleItemRepository.delete(saleItem);
+    // 🔍 Get items by sale ID
+    public List<SaleItem> getItemsBySaleId(Long saleId) {
+        return saleItemRepository.findBySaleId(saleId);
     }
 
-    public SaleItem getSaleItemById(Long id) {
-        return saleItemRepository.findById(id);
-    }
-
-    public List<SaleItem> getAllSaleItems() {
-        return saleItemRepository.findAll();
+    // ❌ Remove item and restore stock
+    public void removeItem(Long itemId) {
+        SaleItem item = saleItemRepository.findById(itemId);
+        if (item != null) {
+            Product product = item.getProduct();
+            product.setStock(product.getStock() + item.getQuantity());
+            productRepository.update(product);
+            saleItemRepository.delete(item);
+            System.out.println("🗑️ Item removed and stock restored.");
+        } else {
+            System.out.println("❌ Item not found.");
+        }
     }
 }
+

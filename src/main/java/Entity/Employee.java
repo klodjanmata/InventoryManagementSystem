@@ -1,31 +1,29 @@
 package Entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "Employee")
-@Getter
-@Setter
+@Table(name = "employee")
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
+@Setter
 public class Employee {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // auto-increment
     private Long id;
 
-    @Column(name = "Name")
+    @Column(nullable = false)
     private String name;
 
-    @Column(name = "Role")
+    @Column(nullable = false)
     private String role;
 
-    @Column(name = "hire_date")
+    @Column(name = "hire_date", nullable = false)
     private LocalDate hireDate;
 
     @Override

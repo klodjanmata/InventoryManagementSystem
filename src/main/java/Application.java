@@ -37,7 +37,7 @@ public class Application {
         productService = new ProductService();
         supplierService = new SupplierService();
         saleService = new SaleService();
-        saleItemService = new SaleItemService();
+        saleItemService = new SaleItemService(saleItemRepository, productRepository);
     }
 
 
@@ -88,6 +88,12 @@ public class Application {
                 Menu.productMenu();
                 int productChoice = getChoice();
                 applicationManager.productMenuSelection(productChoice);
+                break;
+
+            case 5:
+                Menu.saleMenu();
+                int saleChoice = getChoice();
+                applicationManager.saleMenuSelection(saleChoice);
                 break;
 
             case 6:

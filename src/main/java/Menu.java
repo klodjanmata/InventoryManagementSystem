@@ -13,6 +13,7 @@ public class Menu {
     }
 
     public static void customerMenu() {
+        System.out.println("*** CUSTOMER MENU ***");
         System.out.println("1. Add Customer");
         System.out.println("2. List All Customers");
         System.out.println("3. Edit Customer");
@@ -21,6 +22,7 @@ public class Menu {
     }
 
     public static void categoryMenu() {
+        System.out.println("*** CATEGORY MENU ***");
         System.out.println("1. Add Category");
         System.out.println("2. List All Categories");
         System.out.println("3. Edit Category");
@@ -29,6 +31,7 @@ public class Menu {
     }
 
     public static void employeeMenu() {
+        System.out.println("*** EMPLOYEE MENU ***");
         System.out.println("1. Add Employee");
         System.out.println("2. List All Employees");
         System.out.println("3. Edit Employee");
@@ -37,6 +40,7 @@ public class Menu {
     }
 
     public static void productMenu() {
+        System.out.println("*** PRODUCT MENU ***");
         System.out.println("1. Add Product");
         System.out.println("2. List All Products");
         System.out.println("3. Edit Product");
@@ -44,7 +48,17 @@ public class Menu {
         System.out.println("0. Back");
     }
 
+    public static void saleMenu(){
+        System.out.println("*** SALE MENU ***");
+        System.out.println("1. Make a Sale");
+        System.out.println("2. Print All Sales");
+        System.out.println("3. Print Sale Details");
+
+
+    }
+
     public static void supplierMenu() {
+        System.out.println("*** SUPPLIER MENU ***");
         System.out.println("1. Add Supplier");
         System.out.println("2. List All Suppliers");
         System.out.println("3. Edit Supplier");

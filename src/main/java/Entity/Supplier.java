@@ -1,34 +1,38 @@
 package Entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
+@Table(name = "supplier")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-@Table (name = "Supplier")
-
 public class Supplier {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // auto-increment
+    private Long id;
 
-    @Column(name = "name")
+    @Column(nullable = false)
     private String name;
-    @Column(name = "contact")
+
+    @Column
     private String contact;
-    @Column(name = "email")
+
+    @Column(unique = true)
     private String email;
+
+    // One supplier can provide many products
+    @OneToMany(mappedBy = "supplier", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Product> products = new ArrayList<>();
 
     @Override
     public String toString() {
         return id + "\t" + name + "\t" + contact +  "\t" + email;
     }
-
 }

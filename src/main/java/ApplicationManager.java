@@ -30,7 +30,7 @@ public class ApplicationManager {
         productRepository = new ProductRepository();
         productService = new ProductService();
         saleItemRepository = new SaleItemRepository();
-        saleItemService = new SaleItemService();
+        saleItemService = new SaleItemService(saleItemRepository, productRepository);
         saleRepository = new SaleRepository();
         saleService = new SaleService();
         supplierRepository = new SupplierRepository();
@@ -138,7 +138,15 @@ public class ApplicationManager {
                 break;
 
             case 2:
-                productService.getAllProducts();
+                productService.printAllProducts();
+                break;
+
+            case 3:
+                productService.updateProduct();
+                break;
+
+            case 4:
+                productService.deleteProduct();
                 break;
 
             case 0:
@@ -148,6 +156,21 @@ public class ApplicationManager {
                 System.out.println("Unsupported choice! Try again!");
                 break;
         }
+    }
+
+    public void saleMenuSelection(int choice){
+        switch (choice){
+            case 1:
+                saleService.makeSale();
+                break;
+            case 2:
+                saleService.printAllSales();
+                break;
+            case 3:
+                saleService.printSaleDetails();
+
+        }
+
     }
 
     public void supplierMenuSelection(int choice){

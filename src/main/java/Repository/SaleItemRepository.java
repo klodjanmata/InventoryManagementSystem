@@ -6,6 +6,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public class SaleItemRepository {
@@ -59,6 +60,38 @@ public class SaleItemRepository {
     public List<SaleItem> findAll() {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             return session.createQuery("from SaleItem", SaleItem.class).list();
+        }
+    }
+
+    public List<SaleItem> findBySaleId(Long saleId) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            return session.createQuery("FROM SaleItem si WHERE si.sale.id = :saleId", SaleItem.class)
+                    .setParameter("saleId", saleId)
+                    .list();
+        }
+    }
+
+    public BigDecimal calculateSubtotal(SaleItem item) {
+        return item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity()));
+    }
+
+    public List<SaleItem> findByProductId(Long productId) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            return session.createQuery("FROM SaleItem si WHERE si.product.id = :productId", SaleItem.class)
+                    .setParameter("productId", productId)
+                    .list();
+        }
+    }
+
+    private void executeTransaction(java.util.function.Consumer<Session> action) {
+        Transaction tx = null;
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            tx = session.beginTransaction();
+            action.accept(session);
+            tx.commit();
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
+            throw e;
         }
     }
 }

@@ -1,10 +1,7 @@
 package Entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigDecimal;
 
@@ -14,21 +11,25 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @Getter
 @Setter
-
 public class SaleItem {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.IDENTITY) // auto-increment
     private Long id;
 
+    // Many items belong to one sale
     @ManyToOne
-    @JoinColumn(name = "sale_id")
+    @JoinColumn(name = "sale_id", nullable = false)
     private Sale sale;
 
+    // Many sale items can reference one product
     @ManyToOne
+    @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    @Column(name = "quantity")
+    @Column(nullable = false)
     private Integer quantity;
-    @Column(name = "price")
+
+    @Column(nullable = false)
     private BigDecimal price;
 }
