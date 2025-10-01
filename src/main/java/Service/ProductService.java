@@ -184,4 +184,107 @@ public class ProductService {
             System.out.println("Category: None");
         }
     }
+
+    public void printProductsByCategory() {
+        System.out.println("🔎 Filter Products by Category");
+
+        // Show all categories first
+        categoryService.printAllCategories();
+        Long categoryId = Helper.getLongFromUser("Enter Category ID to filter products");
+
+        Optional<Category> categoryOpt = Optional.ofNullable(categoryRepository.findById(categoryId));
+        if (categoryOpt.isEmpty()) {
+            System.out.println("❌ Category not found. Aborting filter.");
+            return;
+        }
+
+        Category category = categoryOpt.get();
+        List<Product> products = productRepository.findAll();
+
+        // Filter products by category
+        List<Product> filtered = products.stream()
+                .filter(p -> p.getCategory() != null && p.getCategory().getId().equals(category.getId()))
+                .toList();
+
+        if (filtered.isEmpty()) {
+            System.out.println("⚠️ No products found in category: " + category.getName());
+        } else {
+            System.out.println("✅ Products in category: " + category.getName());
+            Printer.printProducts(filtered);
+        }
+    }
+
+    public void printProductsBySupplier() {
+        System.out.println("🔎 Filter Products by Supplier");
+
+        // Show all suppliers first
+        supplierService.printAllSuppliers();
+        int supplierId = Helper.getIntFromUser("Enter Supplier ID to filter products");
+
+        Optional<Supplier> supplierOpt = Optional.ofNullable(supplierRepository.findById(supplierId));
+        if (supplierOpt.isEmpty()) {
+            System.out.println("❌ Supplier not found. Aborting filter.");
+            return;
+        }
+
+        Supplier supplier = supplierOpt.get();
+        List<Product> products = productRepository.findAll();
+
+        // Filter products by supplier
+        List<Product> filtered = products.stream()
+                .filter(p -> p.getSupplier() != null && p.getSupplier().getId().equals(supplier.getId()))
+                .toList();
+
+        if (filtered.isEmpty()) {
+            System.out.println("⚠️ No products found for supplier: " + supplier.getName());
+        } else {
+            System.out.println("✅ Products supplied by: " + supplier.getName());
+            Printer.printProducts(filtered);
+        }
+    }
+
+    public void printLowStockProducts() {
+        System.out.println("📉 Filter Products by Stock Threshold");
+
+        int threshold = Helper.getIntFromUser("Enter stock threshold value");
+
+        List<Product> products = productRepository.findAll();
+
+        List<Product> lowStock = products.stream()
+                .filter(p -> p.getStock() < threshold)
+                .toList();
+
+        if (lowStock.isEmpty()) {
+            System.out.println("✅ All products have stock above " + threshold);
+        } else {
+            System.out.println("⚠️ Products with stock below " + threshold + ":");
+            Printer.printProducts(lowStock);
+        }
+    }
+
+    public void printProductsByPriceRange() {
+        System.out.println("💰 Filter Products by Price Range");
+
+        BigDecimal minPrice = Helper.getBigDecimalFromUser("Enter minimum price");
+        BigDecimal maxPrice = Helper.getBigDecimalFromUser("Enter maximum price");
+
+        if (minPrice.compareTo(maxPrice) > 0) {
+            System.out.println("❌ Minimum price cannot be greater than maximum price. Aborting filter.");
+            return;
+        }
+
+        List<Product> products = productRepository.findAll();
+
+        List<Product> filtered = products.stream()
+                .filter(p -> p.getPrice().compareTo(minPrice) >= 0 &&
+                        p.getPrice().compareTo(maxPrice) <= 0)
+                .toList();
+
+        if (filtered.isEmpty()) {
+            System.out.println("⚠️ No products found in the price range " + minPrice + " - " + maxPrice);
+        } else {
+            System.out.println("✅ Products in the price range " + minPrice + " - " + maxPrice + ":");
+            Printer.printProducts(filtered);
+        }
+    }
 }

@@ -55,7 +55,7 @@ public class EmployeeService {
             // Prompt for new values
             String newName = Helper.getStringFromUser("Enter new name (leave blank to keep current)");
             String newRole = Helper.getStringFromUser("Enter new Role (leave blank to keep current)");
-            LocalDate newHireDate = Helper.getLocalDateFromUser1("Enter new Hire Date (leave blank to keep current)");
+            LocalDate newHireDate = Helper.getLocalDateFromUser("Enter new Hire Date (leave blank to keep current)");
 
             // Update only if new value is provided
             if (!newName.trim().isEmpty()) employee.setName(newName);

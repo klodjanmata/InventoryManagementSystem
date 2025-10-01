@@ -2,129 +2,135 @@ package Util;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
+import java.time.format.DateTimeParseException;
+import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 
 public class Helper {
 
-    public static DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+    private static final Scanner sc = new Scanner(System.in);
+    public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
-    public static String getStringFromUser(String message){
+    public static String getStringFromUser(String message) {
         System.out.print(message + ": ");
-        Scanner sc = new Scanner(System.in);
-        return sc.nextLine();
+        return sc.nextLine().trim();
     }
 
-    public static char getCharFromUser(String message){
-        return Helper.getStringFromUser(message).charAt(0);
+    public static char getCharFromUser(String message) {
+        String input = getStringFromUser(message);
+        return input.isEmpty() ? '\0' : input.charAt(0);
     }
 
-    public static int getIntFromUser(String message){
-        System.out.print(message + ": ");
-        Scanner sc = new Scanner(System.in);
-        return sc.nextInt();
-    }
-
-    public static float getFloatFromUser(String message){
-        System.out.print(message + ": ");
-        Scanner sc = new Scanner(System.in);
-        return sc.nextFloat();
-    }
-
-    public static String convertListToString(List<String> values) {
-        String result = "[";
-        for (String value : values) {
-            result += value + ", ";
+    public static int getIntFromUser(String message) {
+        while (true) {
+            System.out.print(message + ": ");
+            try {
+                return Integer.parseInt(sc.nextLine().trim());
+            } catch (NumberFormatException e) {
+                System.out.println("❌ Invalid input. Please enter a valid integer.");
+            }
         }
-        result += "]";
-        return result;
     }
 
-    public static boolean getBooleanFromUser(String message){
-        System.out.print(message + ": ");
-        Scanner sc = new Scanner(System.in);
-        return sc.nextBoolean();
-    }
-
-    public static LocalDate getLocalDateFromUser(String message){
-        System.out.println("Expected date format: dd.MM.yyyy");
-        System.out.print(message + ": ");
-        Scanner sc = new Scanner(System.in);
-
-        try {
-            return LocalDate.parse(sc.nextLine(), DATE_FORMATTER);
-        }catch (Exception e){
-            return new Date().toInstant()
-                    .atZone(ZoneId.systemDefault())
-                    .toLocalDate();
+    public static float getFloatFromUser(String message) {
+        while (true) {
+            System.out.print(message + ": ");
+            try {
+                return Float.parseFloat(sc.nextLine().trim());
+            } catch (NumberFormatException e) {
+                System.out.println("❌ Invalid input. Please enter a valid float value.");
+            }
         }
-
     }
 
-    public static LocalDate getLocalDateFromUser1(String message) {
-        System.out.println("Expected date format: dd.MM.yyyy");
-        System.out.print(message + ": ");
-        Scanner sc = new Scanner(System.in);
-        String input = sc.nextLine().trim();
-
-        if (input.isEmpty()) {
-            return null; // User chose not to update the date
+    public static boolean getBooleanFromUser(String message) {
+        while (true) {
+            System.out.print(message + " (true/false): ");
+            String input = sc.nextLine().trim().toLowerCase();
+            if (input.equals("true") || input.equals("yes") || input.equals("y")) {
+                return true;
+            } else if (input.equals("false") || input.equals("no") || input.equals("n")) {
+                return false;
+            } else {
+                System.out.println("❌ Invalid input. Please enter true/false or yes/no.");
+            }
         }
+    }
 
-        try {
-            return LocalDate.parse(input, DATE_FORMATTER);
-        } catch (Exception e) {
-            System.out.println("❌ Invalid date format. Please try again.");
-            return getLocalDateFromUser(message); // Recursively ask again
+    public static LocalDate getLocalDateFromUser(String message) {
+        while (true) {
+            System.out.println("Expected date format: dd.MM.yyyy");
+            System.out.print(message + ": ");
+            String input = sc.nextLine().trim();
+
+            if (input.isEmpty()) {
+                return null; // User chose not to provide a date
+            }
+
+            try {
+                return LocalDate.parse(input, DATE_FORMATTER);
+            } catch (DateTimeParseException e) {
+                System.out.println("❌ Invalid date format. Please try again (e.g., 01.10.2025).");
+            }
         }
     }
 
     public static Long getLongFromUser(String message) {
-        System.out.print(message + ": ");
-        Scanner sc = new Scanner(System.in);
         while (true) {
+            System.out.print(message + ": ");
             String input = sc.nextLine().trim();
             try {
                 return Long.parseLong(input);
             } catch (NumberFormatException e) {
-                System.out.print("❌ Invalid number. Please enter a valid long value: ");
+                System.out.println("❌ Invalid number. Please enter a valid long value.");
             }
         }
     }
 
     public static double getDoubleFromUser(String message) {
-        System.out.print(message + ": ");
-        Scanner sc = new Scanner(System.in);
         while (true) {
+            System.out.print(message + ": ");
             String input = sc.nextLine().trim();
             try {
                 return Double.parseDouble(input);
             } catch (NumberFormatException e) {
-                System.out.print("❌ Invalid number. Please enter a valid decimal value: ");
+                System.out.println("❌ Invalid number. Please enter a valid decimal value.");
             }
         }
     }
 
     public static BigDecimal getBigDecimalFromUser(String message) {
-        System.out.print(message + ": ");
-        Scanner sc = new Scanner(System.in);
         while (true) {
+            System.out.print(message + ": ");
             String input = sc.nextLine().trim();
             try {
-                // Parse directly into BigDecimal (avoids double precision issues)
-                return new BigDecimal(input);
+                return new BigDecimal(input); // avoids double precision issues
             } catch (NumberFormatException e) {
-                System.out.print("❌ Invalid number. Please enter a valid decimal value: ");
+                System.out.println("❌ Invalid number. Please enter a valid decimal value.");
             }
         }
     }
 
+    public static String convertListToString(List<String> values) {
+        return values == null || values.isEmpty()
+                ? "[]"
+                : "[" + String.join(", ", values) + "]";
+    }
 
+    public static boolean getYesNoFromUser(String message) {
+        while (true) {
+            System.out.print(message + " (yes/no): ");
+            String input = sc.nextLine().trim().toLowerCase();
 
-
+            if (input.equals("yes") || input.equals("y")) {
+                return true;
+            } else if (input.equals("no") || input.equals("n")) {
+                return false;
+            } else {
+                System.out.println("❌ Invalid input. Please type 'yes' or 'no'.");
+            }
+        }
+    }
 }
-
-

@@ -67,39 +67,31 @@ public class Application {
     private static boolean manageAction(int choice, Application application){
         switch (choice){
             case 1:
-                Menu.customerMenu();
-                int customerChoice = getChoice();
-                applicationManager.customerMenuSelection(customerChoice);
+                applicationManager.customerMenuSelection(0);
                 break;
 
             case 2:
-                Menu.categoryMenu();
-                int categoryChoice = getChoice();
-                applicationManager.categoryMenuSelection(categoryChoice);
+                applicationManager.categoryMenuSelection(0);
                 break;
 
             case 3:
-                Menu.employeeMenu();
-                int employeeChoice = getChoice();
-                applicationManager.employeeMenuSelection(employeeChoice);
+                applicationManager.employeeMenuSelection(0);
                 break;
 
             case 4:
-                Menu.productMenu();
-                int productChoice = getChoice();
-                applicationManager.productMenuSelection(productChoice);
+                applicationManager.productMenuSelection(0);
                 break;
 
             case 5:
-                Menu.saleMenu();
-                int saleChoice = getChoice();
-                applicationManager.saleMenuSelection(saleChoice);
+                applicationManager.saleMenuSelection(0);
                 break;
 
             case 6:
-                Menu.supplierMenu();
-                int supplierChoice = getChoice();
-                applicationManager.supplierMenuSelection(supplierChoice);
+                applicationManager.supplierMenuSelection(0);
+                break;
+
+            case 7:
+                applicationManager.filteringMenuSelection(0);
                 break;
 
             case 0:

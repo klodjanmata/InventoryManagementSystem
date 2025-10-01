@@ -3,9 +3,12 @@ package Service;
 import Entity.*;
 import Repository.*;
 import Util.Helper;
+import Util.Printer;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -74,7 +77,8 @@ public class SaleService {
         sale.setTotalAmount(totalAmount);
         saleRepository.save(sale);
 
-        System.out.println("✅ Sale completed. Total: " + totalAmount + " EUR");
+        System.out.println("✅ Sale completed."); //+ totalAmount + " EUR");
+        Printer.printInvoice(sale);
     }
 
     public void printSaleDetails() {
@@ -89,34 +93,34 @@ public class SaleService {
             return;
         }
 
-        printInvoice(sale);
+        Printer.printInvoice(sale);
     }
 
-    public void printSalesByCustomer() {
-        System.out.println("🔍 View sales by customer");
-
-        customerService.printAllCustomers();
-        int customerId = Helper.getIntFromUser("Enter Customer ID");
-        Optional<Customer> customerOpt = Optional.ofNullable(customerRepository.findById(customerId));
-
-        if (customerOpt.isEmpty()) {
-            System.out.println("❌ Customer not found.");
-            return;
-        }
-
-        List<Sale> sales = saleRepository.findByCustomerId(customerId);
-        if (sales.isEmpty()) {
-            System.out.println("📭 No sales found for this customer.");
-            return;
-        }
-
-        for (Sale sale : sales) {
-            System.out.println("🧾 Sale ID: " + sale.getId() +
-                    " | Date: " + sale.getSaleDate() +
-                    " | Total: " + sale.getTotalAmount() + " EUR" +
-                    " | Items: " + sale.getItems().size());
-        }
-    }
+//    public void printSalesByCustomer() {
+//        System.out.println("🔍 View sales by customer");
+//
+//        customerService.printAllCustomers();
+//        int customerId = Helper.getIntFromUser("Enter Customer ID");
+//        Optional<Customer> customerOpt = Optional.ofNullable(customerRepository.findById(customerId));
+//
+//        if (customerOpt.isEmpty()) {
+//            System.out.println("❌ Customer not found.");
+//            return;
+//        }
+//
+//        List<Sale> sales = saleRepository.findByCustomerId(customerId);
+//        if (sales.isEmpty()) {
+//            System.out.println("📭 No sales found for this customer.");
+//            return;
+//        }
+//
+//        for (Sale sale : sales) {
+//            System.out.println("🧾 Sale ID: " + sale.getId() +
+//                    " | Date: " + sale.getSaleDate() +
+//                    " | Total: " + sale.getTotalAmount() + " EUR" +
+//                    " | Items: " + sale.getItems().size());
+//        }
+//    }
 
     public void updateSale(Sale sale) {
         saleRepository.update(sale);
@@ -139,51 +143,149 @@ public class SaleService {
             return;
         }
 
+        Printer.printSales(sales);
+
         for (Sale sale : sales) {
             Customer customer = sale.getCustomer();
             int itemCount = sale.getItems() != null ? sale.getItems().size() : 0;
 
-            System.out.println("🔹 Sale ID: " + sale.getId());
-            System.out.println("   👤 Customer: " + (customer != null ? customer.getId() + " - " + customer.getName() : "Unknown"));
-            System.out.println("   📅 Date: " + sale.getSaleDate());
-            System.out.println("   🧺 Items: " + itemCount);
-            System.out.println("   💰 Total: " + sale.getTotalAmount() + " EUR");
-            System.out.println("--------------------------------------------------");
+
+
+//            System.out.println("🔹 Sale ID: " + sale.getId());
+//            System.out.println("   👤 Customer: " + (customer != null ? customer.getId() + " - " + customer.getName() : "Unknown"));
+//            System.out.println("   📅 Date: " + sale.getSaleDate());
+//            System.out.println("   🧺 Items: " + itemCount);
+//            System.out.println("   💰 Total: " + sale.getTotalAmount() + " EUR");
+//            System.out.println("--------------------------------------------------");
         }
     }
 
-    private void printInvoice(Sale sale) {
-        Customer customer = sale.getCustomer();
+    public void printSalesByDateRange() {
+        System.out.println("📅 Filter Sales by Date Range (format: dd.MM.yyyy)");
 
-        System.out.println("===============================================");
-        System.out.println("           📦 TECH SHOP INVOICE 📦             ");
-        System.out.println("===============================================");
-        System.out.println("🧾 Sale ID     : " + sale.getId());
-        System.out.println("👤 Customer    : " + (customer != null ? customer.getId() + " - " + customer.getName() : "Unknown"));
-        System.out.println("📅 Date        : " + sale.getSaleDate());
-        System.out.println("-----------------------------------------------");
-        System.out.println("🧺 Items:");
-        System.out.printf("   %-20s %5s %10s %12s%n", "Product", "Qty", "Unit Price", "Subtotal");
+        LocalDate start = Helper.getLocalDateFromUser("Enter start date");
+        if (start == null) {
+            System.out.println("⚠️ No start date provided. Aborting filter.");
+            return;
+        }
 
-        List<SaleItem> items = sale.getItems();
-        if (items == null || items.isEmpty()) {
-            System.out.println("   No items in this sale.");
+        LocalDate end = Helper.getLocalDateFromUser("Enter end date");
+        if (end == null) {
+            System.out.println("⚠️ No end date provided. Aborting filter.");
+            return;
+        }
+
+        List<Sale> sales = saleRepository.findAll();
+
+        List<Sale> filtered = sales.stream()
+                .filter(s -> !s.getSaleDate().isBefore(start) && !s.getSaleDate().isAfter(end))
+                .toList();
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+
+        if (filtered.isEmpty()) {
+            System.out.println("⚠️ No sales found between " + start.format(formatter) + " and " + end.format(formatter));
         } else {
-            for (SaleItem item : items) {
+            System.out.println("✅ Sales between " + start.format(formatter) + " and " + end.format(formatter) + ":");
+            Printer.printSales(filtered);
+        }
+    }
+
+    public void printSalesByCustomer() {
+        System.out.println("👤 Filter Sales by Customer");
+
+        customerService.printAllCustomers();
+        int customerId = Helper.getIntFromUser("Enter Customer ID");
+
+        Optional<Customer> customerOpt = Optional.ofNullable(customerRepository.findById(customerId));
+        if (customerOpt.isEmpty()) {
+            System.out.println("❌ Customer not found. Aborting filter.");
+            return;
+        }
+
+        Customer customer = customerOpt.get();
+        List<Sale> sales = saleRepository.findAll();
+
+        List<Sale> filtered = sales.stream()
+                .filter(s -> s.getCustomer() != null && s.getCustomer().getId() == customer.getId())
+                .toList();
+
+        if (filtered.isEmpty()) {
+            System.out.println("⚠️ No sales found for customer: " + customer.getName());
+        } else {
+            System.out.println("✅ Sales for customer: " + customer.getName());
+            Printer.printSales(filtered);
+        }
+    }
+
+    public void printSalesByAmount() {
+        System.out.println("💰 Filter Sales by Total Amount");
+
+        double min = Helper.getDoubleFromUser("Enter minimum amount");
+        double max = Helper.getDoubleFromUser("Enter maximum amount");
+
+        if (min > max) {
+            System.out.println("❌ Minimum cannot be greater than maximum. Aborting filter.");
+            return;
+        }
+
+        List<Sale> sales = saleRepository.findAll();
+
+        List<Sale> filtered = sales.stream()
+                .filter(s -> {
+                    double total = s.getTotalAmount().doubleValue();
+                    return total >= min && total <= max;
+                })
+                .toList();
+
+        if (filtered.isEmpty()) {
+            System.out.println("⚠️ No sales found in range " + min + " - " + max);
+        } else {
+            System.out.println("✅ Sales in range " + min + " - " + max + ":");
+            Printer.printSales(filtered);
+        }
+    }
+
+    public void deleteSale() {
+        System.out.println("🗑️ Delete Sale");
+
+        printAllSales();
+        Long saleId = Helper.getLongFromUser("Enter Sale ID to delete");
+
+        Optional<Sale> saleOpt = Optional.ofNullable(saleRepository.findById(saleId));
+        if (saleOpt.isEmpty()) {
+            System.out.println("❌ Sale with ID " + saleId + " not found.");
+            return;
+        }
+
+        Sale sale = saleOpt.get();
+
+        System.out.println("Sale ID: " + sale.getId() +
+                " | Date: " + sale.getSaleDate() +
+                " | Total: " + sale.getTotalAmount());
+
+        boolean confirm = Helper.getYesNoFromUser("Are you sure you want to delete this sale?");
+        if (!confirm) {
+            System.out.println("❎ Deletion cancelled.");
+            return;
+        }
+
+        // 🔄 Restore stock for each item
+        if (sale.getItems() != null) {
+            for (SaleItem item : sale.getItems()) {
                 Product product = item.getProduct();
-                BigDecimal subtotal = item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity()));
-                System.out.printf("   %-20s %5d %10.2f %12.2f%n",
-                        product.getName(),
-                        item.getQuantity(),
-                        item.getPrice(),
-                        subtotal);
+                if (product != null) {
+                    product.setStock(product.getStock() + item.getQuantity());
+                    productRepository.update(product); // make sure your repo has update()
+                }
             }
         }
 
-        System.out.println("-----------------------------------------------");
-        System.out.printf("💰 TOTAL AMOUNT: %38.2f EUR%n", sale.getTotalAmount());
-        System.out.println("===============================================");
-        System.out.println("         ✅ Thank you for your purchase!        ");
-        System.out.println("===============================================");
+        // 🗑️ Delete the sale
+        saleRepository.delete(sale);
+        System.out.println("✅ Sale deleted and stock restored.");
     }
+
+
+
 }
