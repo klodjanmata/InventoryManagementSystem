@@ -6,12 +6,12 @@ import Util.Helper;
 import Util.Printer;
 
 import java.math.BigDecimal;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.time.format.TextStyle;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class SaleService {
 
@@ -19,6 +19,8 @@ public class SaleService {
     private CustomerService customerService = new CustomerService();
     private CustomerRepository customerRepository = new CustomerRepository();
     private ProductService productService = new ProductService();
+    private CategoryRepository categoryRepository = new CategoryRepository();
+    private CategoryService categoryService = new CategoryService();
     private final SaleRepository saleRepository = new SaleRepository();
     private final SaleItemService saleItemService = new SaleItemService(new SaleItemRepository(), productRepository);
 
@@ -122,18 +124,6 @@ public class SaleService {
 //        }
 //    }
 
-    public void updateSale(Sale sale) {
-        saleRepository.update(sale);
-    }
-
-    public void deleteSale(Sale sale) {
-        saleRepository.delete(sale);
-    }
-
-    public Sale getSaleById(Long id) {
-        return saleRepository.findById(id);
-    }
-
     public void printAllSales() {
         System.out.println("📦 All Sales Overview");
 
@@ -145,19 +135,19 @@ public class SaleService {
 
         Printer.printSales(sales);
 
-        for (Sale sale : sales) {
-            Customer customer = sale.getCustomer();
-            int itemCount = sale.getItems() != null ? sale.getItems().size() : 0;
-
-
-
-//            System.out.println("🔹 Sale ID: " + sale.getId());
-//            System.out.println("   👤 Customer: " + (customer != null ? customer.getId() + " - " + customer.getName() : "Unknown"));
-//            System.out.println("   📅 Date: " + sale.getSaleDate());
-//            System.out.println("   🧺 Items: " + itemCount);
-//            System.out.println("   💰 Total: " + sale.getTotalAmount() + " EUR");
-//            System.out.println("--------------------------------------------------");
-        }
+//        for (Sale sale : sales) {
+//            Customer customer = sale.getCustomer();
+//            int itemCount = sale.getItems() != null ? sale.getItems().size() : 0;
+//
+//
+//
+////            System.out.println("🔹 Sale ID: " + sale.getId());
+////            System.out.println("   👤 Customer: " + (customer != null ? customer.getId() + " - " + customer.getName() : "Unknown"));
+////            System.out.println("   📅 Date: " + sale.getSaleDate());
+////            System.out.println("   🧺 Items: " + itemCount);
+////            System.out.println("   💰 Total: " + sale.getTotalAmount() + " EUR");
+////            System.out.println("--------------------------------------------------");
+//        }
     }
 
     public void printSalesByDateRange() {
@@ -276,7 +266,7 @@ public class SaleService {
                 Product product = item.getProduct();
                 if (product != null) {
                     product.setStock(product.getStock() + item.getQuantity());
-                    productRepository.update(product); // make sure your repo has update()
+                    productRepository.update(product);
                 }
             }
         }
@@ -284,6 +274,278 @@ public class SaleService {
         // 🗑️ Delete the sale
         saleRepository.delete(sale);
         System.out.println("✅ Sale deleted and stock restored.");
+    }
+
+    public void printSalesByCategory() {
+        System.out.println("🏷️ Filter Sales by Product Category");
+
+        // 1. Show all categories
+        categoryService.printAllCategories();
+        Long categoryId = Helper.getLongFromUser("Enter Category ID");
+
+        Optional<Category> categoryOpt = Optional.ofNullable(categoryRepository.findById(categoryId));
+        if (categoryOpt.isEmpty()) {
+            System.out.println("❌ Category not found. Aborting filter.");
+            return;
+        }
+
+        Category category = categoryOpt.get();
+
+        // 2. Get all sales
+        List<Sale> sales = saleRepository.findAll();
+
+        // 3. Filter sales that contain at least one product from this category
+        List<Sale> filtered = sales.stream()
+                .filter(sale -> sale.getItems() != null &&
+                        sale.getItems().stream()
+                                .anyMatch(item -> item.getProduct() != null &&
+                                        item.getProduct().getCategory() != null &&
+                                        item.getProduct().getCategory().getId() == category.getId()))
+                .toList();
+
+        // 4. Print results
+        if (filtered.isEmpty()) {
+            System.out.println("⚠️ No sales found for category: " + category.getName());
+        } else {
+            System.out.println("✅ Sales for category: " + category.getName());
+            Printer.printSales(filtered);
+        }
+    }
+
+    public void printSalesByProduct() {
+        System.out.println("🔍 Filter Sales by Specific Product");
+
+        // 1. Show all products so user can choose
+        productService.printAllProducts();
+        int productId = Helper.getIntFromUser("Enter Product ID");
+
+        Optional<Product> productOpt = Optional.ofNullable(productRepository.findById(productId));
+        if (productOpt.isEmpty()) {
+            System.out.println("❌ Product not found. Aborting filter.");
+            return;
+        }
+
+        Product product = productOpt.get();
+
+        // 2. Get all sales
+        List<Sale> sales = saleRepository.findAll();
+
+        // 3. Filter sales that contain this product
+        List<Sale> filtered = sales.stream()
+                .filter(sale -> sale.getItems() != null &&
+                        sale.getItems().stream()
+                                .anyMatch(item -> item.getProduct() != null &&
+                                        item.getProduct().getId() == product.getId()))
+                .toList();
+
+        // 4. Print results
+        if (filtered.isEmpty()) {
+            System.out.println("⚠️ No sales found for product: " + product.getName());
+        } else {
+            System.out.println("✅ Sales containing product: " + product.getName());
+            Printer.printSales(filtered);
+        }
+    }
+
+    public void printSalesByCustomerAndAmountRange() {
+        System.out.println("👤💰 Filter Sales by Customer and Amount Range");
+
+        // 1. Show all customers
+        customerService.printAllCustomers();
+        int customerId = Helper.getIntFromUser("Enter Customer ID");
+
+        Optional<Customer> customerOpt = Optional.ofNullable(customerRepository.findById(customerId));
+        if (customerOpt.isEmpty()) {
+            System.out.println("❌ Customer not found. Aborting filter.");
+            return;
+        }
+
+        Customer customer = customerOpt.get();
+
+        // 2. Ask for amount range
+        double min = Helper.getDoubleFromUser("Enter minimum amount");
+        double max = Helper.getDoubleFromUser("Enter maximum amount");
+
+        if (min > max) {
+            System.out.println("❌ Minimum cannot be greater than maximum. Aborting filter.");
+            return;
+        }
+
+        // 3. Get all sales
+        List<Sale> sales = saleRepository.findAll();
+
+        // 4. Filter by customer AND amount range
+        List<Sale> filtered = sales.stream()
+                .filter(s -> s.getCustomer() != null && s.getCustomer().getId() == customer.getId())
+                .filter(s -> {
+                    double total = s.getTotalAmount().doubleValue();
+                    return total >= min && total <= max;
+                })
+                .toList();
+
+        // 5. Print results
+        if (filtered.isEmpty()) {
+            System.out.println("⚠️ No sales found for customer " + customer.getName() +
+                    " in range " + min + " - " + max);
+        } else {
+            System.out.println("✅ Sales for customer " + customer.getName() +
+                    " in range " + min + " - " + max + ":");
+            Printer.printSales(filtered);
+        }
+    }
+
+    public void printTop5CustomersBySalesVolume() {
+        System.out.println("🏆 Top 5 Customers by Sales Volume (including ties)");
+
+        // 1. Get all sales
+        List<Sale> sales = saleRepository.findAll();
+        if (sales.isEmpty()) {
+            System.out.println("❌ No sales found.");
+            return;
+        }
+
+        // 2. Group sales by customer and sum total amounts
+        Map<Customer, BigDecimal> totalsByCustomer = sales.stream()
+                .filter(s -> s.getCustomer() != null)
+                .collect(Collectors.groupingBy(
+                        Sale::getCustomer,
+                        Collectors.mapping(Sale::getTotalAmount,
+                                Collectors.reducing(BigDecimal.ZERO, BigDecimal::add))
+                ));
+
+        // 3. Sort customers by total amount descending
+        List<Map.Entry<Customer, BigDecimal>> sorted = totalsByCustomer.entrySet().stream()
+                .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue()))
+                .toList();
+
+        if (sorted.isEmpty()) {
+            System.out.println("⚠️ No customers with sales found.");
+            return;
+        }
+
+        // 4. Determine cutoff (5th place value)
+        int limit = Math.min(5, sorted.size());
+        BigDecimal cutoffValue = sorted.get(limit - 1).getValue();
+
+        // 5. Include all customers with sales >= cutoffValue
+        List<Map.Entry<Customer, BigDecimal>> topWithTies = sorted.stream()
+                .filter(e -> e.getValue().compareTo(cutoffValue) >= 0)
+                .toList();
+
+        // 6. Print results
+        int rank = 1;
+        for (Map.Entry<Customer, BigDecimal> entry : topWithTies) {
+            Customer customer = entry.getKey();
+            BigDecimal total = entry.getValue();
+            System.out.println(rank + ". 👤 " + customer.getName() +
+                    " | Total Sales: " + total + " EUR");
+            rank++;
+        }
+    }
+
+    public void printTop5ProductsBySalesVolume() {
+        System.out.println("🏆 Top 5 Products by Sales Volume (including ties)");
+
+        // 1. Get all sales
+        List<Sale> sales = saleRepository.findAll();
+        if (sales.isEmpty()) {
+            System.out.println("❌ No sales found.");
+            return;
+        }
+
+        // 2. Flatten all sale items
+        List<SaleItem> allItems = sales.stream()
+                .filter(s -> s.getItems() != null)
+                .flatMap(s -> s.getItems().stream())
+                .toList();
+
+        if (allItems.isEmpty()) {
+            System.out.println("⚠️ No sale items found.");
+            return;
+        }
+
+        // 3. Group by product and sum quantities
+        Map<Product, Integer> totalsByProduct = allItems.stream()
+                .filter(item -> item.getProduct() != null)
+                .collect(Collectors.groupingBy(
+                        SaleItem::getProduct,
+                        Collectors.summingInt(SaleItem::getQuantity)
+                ));
+
+        // 4. Sort products by total quantity sold (descending)
+        List<Map.Entry<Product, Integer>> sorted = totalsByProduct.entrySet().stream()
+                .sorted((e1, e2) -> Integer.compare(e2.getValue(), e1.getValue()))
+                .toList();
+
+        if (sorted.isEmpty()) {
+            System.out.println("⚠️ No products found.");
+            return;
+        }
+
+        // 5. Determine cutoff (5th place value)
+        int limit = Math.min(5, sorted.size());
+        int cutoffValue = sorted.get(limit - 1).getValue();
+
+        // 6. Include all products with sales >= cutoffValue
+        List<Map.Entry<Product, Integer>> topWithTies = sorted.stream()
+                .filter(e -> e.getValue() >= cutoffValue)
+                .toList();
+
+        // 7. Print results
+        int rank = 1;
+        for (Map.Entry<Product, Integer> entry : topWithTies) {
+            Product product = entry.getKey();
+            int totalQty = entry.getValue();
+            System.out.println(rank + ". 📦 " + product.getName() +
+                    " | Total Units Sold: " + totalQty);
+            rank++;
+        }
+    }
+
+    public void printMostFrequentSaleDays() {
+        System.out.println("📅 Smart Filter: Most Frequent Sale Days");
+
+        // 1. Get all sales
+        List<Sale> sales = saleRepository.findAll();
+        if (sales.isEmpty()) {
+            System.out.println("❌ No sales found.");
+            return;
+        }
+
+        // 2. Group by day of week and count
+        Map<DayOfWeek, Long> salesByDay = sales.stream()
+                .filter(s -> s.getSaleDate() != null)
+                .collect(Collectors.groupingBy(
+                        s -> s.getSaleDate().getDayOfWeek(),
+                        Collectors.counting()
+                ));
+
+        // 3. Sort by frequency (descending)
+        List<Map.Entry<DayOfWeek, Long>> sorted = salesByDay.entrySet().stream()
+                .sorted((e1, e2) -> Long.compare(e2.getValue(), e1.getValue()))
+                .toList();
+
+        // 4. Find cutoff (most frequent value)
+        long maxCount = sorted.get(0).getValue();
+
+        // 5. Include all days with frequency == maxCount
+        List<Map.Entry<DayOfWeek, Long>> topDays = sorted.stream()
+                .filter(e -> e.getValue() == maxCount)
+                .toList();
+
+        // 6. Print results
+        System.out.println("🏆 Most Frequent Sale Day(s):");
+        for (Map.Entry<DayOfWeek, Long> entry : topDays) {
+            String dayName = entry.getKey().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
+            System.out.println("📅 " + dayName + " → " + entry.getValue() + " sales");
+        }
+
+        // 7. Print full ranking (optional)
+        System.out.println("\n📊 Full Ranking of Days:");
+        for (Map.Entry<DayOfWeek, Long> entry : sorted) {
+            String dayName = entry.getKey().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
+            System.out.println(dayName + " → " + entry.getValue() + " sales");
+        }
     }
 
 

@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 
@@ -133,4 +132,18 @@ public class Helper {
             }
         }
     }
+
+    public static String capitalizeFirstLetter(String text) {
+        try {
+            if (text == null || text.trim().isEmpty()) {
+                return text; // return as-is if null or empty
+            }
+            text = text.trim();
+            return text.substring(0, 1).toUpperCase() + text.substring(1);
+        } catch (Exception e) {
+            System.out.println("⚠️ Error capitalizing text: " + e.getMessage());
+            return text; // fallback: return original text
+        }
+    }
+
 }

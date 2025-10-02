@@ -83,5 +83,108 @@ public class CustomerService {
             System.out.println("❌ No customer found with ID " + customerId);
         }
     }
+
+    public void filterCustomersByName() {
+        System.out.println("🔎 Filter Customers by Name");
+
+        // 1. Ask user for search keyword
+        String keyword = Helper.getStringFromUser("Enter name or part of name to search");
+
+        if (keyword == null || keyword.trim().isEmpty()) {
+            System.out.println("❌ Invalid input. Please enter a valid name.");
+            return;
+        }
+
+        // 2. Get all customers
+        List<Customer> customers = customerRepo.findAll();
+        if (customers.isEmpty()) {
+            System.out.println("⚠️ No customers found in the system.");
+            return;
+        }
+
+        // 3. Filter by name (case-insensitive, partial match)
+        String search = keyword.trim().toLowerCase();
+        List<Customer> filtered = customers.stream()
+                .filter(c -> c.getName() != null && c.getName().toLowerCase().contains(search))
+                .toList();
+
+        // 4. Print results
+        if (filtered.isEmpty()) {
+            System.out.println("⚠️ No customers found with name containing: " + keyword);
+        } else {
+            System.out.println("✅ Customers matching name '" + keyword + "':");
+            Printer.printCustomers(filtered);
+        }
+    }
+
+    public void filterCustomersByEmailDomain() {
+        System.out.println("📧 Filter Customers by Email Domain");
+
+        // 1. Ask user for domain keyword
+        String domain = Helper.getStringFromUser("Enter email domain (e.g., gmail.com)");
+
+        if (domain == null || domain.trim().isEmpty()) {
+            System.out.println("❌ Invalid input. Please enter a valid domain.");
+            return;
+        }
+
+        String searchDomain = domain.trim().toLowerCase();
+
+        // 2. Get all customers
+        List<Customer> customers = customerRepo.findAll();
+        if (customers.isEmpty()) {
+            System.out.println("⚠️ No customers found in the system.");
+            return;
+        }
+
+        // 3. Filter by email domain (case-insensitive)
+        List<Customer> filtered = customers.stream()
+                .filter(c -> c.getEmail() != null && c.getEmail().toLowerCase().endsWith(searchDomain))
+                .toList();
+
+        // 4. Print results
+        if (filtered.isEmpty()) {
+            System.out.println("⚠️ No customers found with email domain: " + searchDomain);
+        } else {
+            System.out.println("✅ Customers with email domain '" + searchDomain + "':");
+            Printer.printCustomers(filtered);
+        }
+    }
+
+    public void filterCustomersByPhonePrefix() {
+        System.out.println("📱 Filter Customers by Phone Prefix");
+
+        // 1. Ask user for phone prefix
+        String prefix = Helper.getStringFromUser("Enter phone prefix (e.g., +355)");
+
+        if (prefix == null || prefix.trim().isEmpty()) {
+            System.out.println("❌ Invalid input. Please enter a valid phone prefix.");
+            return;
+        }
+
+        String searchPrefix = prefix.trim();
+
+        // 2. Get all customers
+        List<Customer> customers = customerRepo.findAll();
+        if (customers.isEmpty()) {
+            System.out.println("⚠️ No customers found in the system.");
+            return;
+        }
+
+        // 3. Filter by phone prefix
+        List<Customer> filtered = customers.stream()
+                .filter(c -> c.getPhone() != null && c.getPhone().startsWith(searchPrefix))
+                .toList();
+
+        // 4. Print results
+        if (filtered.isEmpty()) {
+            System.out.println("⚠️ No customers found with phone prefix: " + searchPrefix);
+        } else {
+            System.out.println("✅ Customers with phone prefix '" + searchPrefix + "':");
+            Printer.printCustomers(filtered);
+        }
+    }
+
+
 }
 

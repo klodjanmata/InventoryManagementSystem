@@ -7,8 +7,10 @@ import Util.Helper;
 import Util.Printer;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class EmployeeService {
     private final EmployeeRepository employeeRepo = new EmployeeRepository();
@@ -23,17 +25,9 @@ public class EmployeeService {
         System.out.println("✅ Hired employee: " + employee.getName());
     }
 
-    public Employee getEmployee(Long id) {
-        return employeeRepo.findById(id);
-    }
-
     public void printAllEmployees() {
         List<Employee> employees = employeeRepo.findAll();
         Printer.printEmployees(employees);
-    }
-
-    public List<Employee> listByRole(String role) {
-        return employeeRepo.findByRole(role);
     }
 
     public void updateEmployee() {
@@ -85,4 +79,144 @@ public class EmployeeService {
             System.out.println("❌ No employee found with ID " + employeeId);
         }
     }
+
+    public void filterEmployeesByRole() {
+        System.out.println("🏷️ Filter Employees by Role");
+
+        // 1. Ask user for role keyword
+        printAllEmployeeRoles();
+        String role = Helper.getStringFromUser("Enter role or part of role to search (e.g., Manager, Cashier)");
+        if (role == null || role.trim().isEmpty()) {
+            System.out.println("❌ Invalid input. Please enter a valid role.");
+            return;
+        }
+
+        // 2. Get all employees
+        List<Employee> employees = employeeRepo.findAll();
+        if (employees.isEmpty()) {
+            System.out.println("⚠️ No employees found in the system.");
+            return;
+        }
+
+        // 3. Filter by role (case-insensitive, partial match)
+        String search = role.trim().toLowerCase();
+        List<Employee> filtered = employees.stream()
+                .filter(e -> e.getRole() != null && e.getRole().toLowerCase().contains(search))
+                .toList();
+
+        // 4. Print results
+        if (filtered.isEmpty()) {
+            System.out.println("⚠️ No employees found with role containing: " + role);
+        } else {
+            System.out.println("✅ Employees with role matching '" + role + "':");
+            Printer.printEmployees(filtered);
+        }
+    }
+
+    public void filterEmployeesByHireDateRange() {
+        System.out.println("📅 Filter Employees by Hire Date Range");
+
+        // 1. Ask user for start and end dates using your helper
+        LocalDate startDate = Helper.getLocalDateFromUser("Enter start date");
+        LocalDate endDate   = Helper.getLocalDateFromUser("Enter end date");
+
+        // 2. Validate input
+        if (startDate == null || endDate == null) {
+            System.out.println("❌ Both start and end dates are required.");
+            return;
+        }
+        if (endDate.isBefore(startDate)) {
+            System.out.println("⚠️ End date cannot be before start date.");
+            return;
+        }
+
+        // 3. Get all employees
+        List<Employee> employees = employeeRepo.findAll();
+        if (employees.isEmpty()) {
+            System.out.println("⚠️ No employees found in the system.");
+            return;
+        }
+
+        // 4. Filter employees by hire date range
+        List<Employee> filtered = employees.stream()
+                .filter(e -> e.getHireDate() != null &&
+                        !e.getHireDate().isBefore(startDate) &&
+                        !e.getHireDate().isAfter(endDate))
+                .toList();
+
+        // 5. Print results
+        if (filtered.isEmpty()) {
+            System.out.println("⚠️ No employees found hired between "
+                    + startDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
+                    + " and "
+                    + endDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy")));
+        } else {
+            System.out.println("✅ Employees hired between "
+                    + startDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
+                    + " and "
+                    + endDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy")) + ":");
+            Printer.printEmployees(filtered);
+        }
+    }
+
+    public void filterEmployeesByName() {
+        System.out.println("🔎 Filter Employees by Name");
+
+        // 1. Ask user for search keyword
+        String keyword = Helper.getStringFromUser("Enter employee name or part of it");
+        if (keyword == null || keyword.trim().isEmpty()) {
+            System.out.println("❌ Invalid input. Please enter a valid name.");
+            return;
+        }
+
+        // 2. Get all employees
+        List<Employee> employees = employeeRepo.findAll();
+        if (employees.isEmpty()) {
+            System.out.println("⚠️ No employees found in the system.");
+            return;
+        }
+
+        // 3. Filter by name (case-insensitive, partial match)
+        String search = keyword.trim().toLowerCase();
+        List<Employee> filtered = employees.stream()
+                .filter(e -> e.getName() != null && e.getName().toLowerCase().contains(search))
+                .toList();
+
+        // 4. Print results
+        if (filtered.isEmpty()) {
+            System.out.println("⚠️ No employees found with name containing: " + keyword);
+        } else {
+            System.out.println("✅ Employees matching name '" + keyword + "':");
+            Printer.printEmployees(filtered);
+        }
+    }
+
+    public void printAllEmployeeRoles() {
+        System.out.println("🏷️ All Employee Roles");
+
+        // 1. Get all employees
+        List<Employee> employees = employeeRepo.findAll();
+        if (employees.isEmpty()) {
+            System.out.println("⚠️ No employees found in the system.");
+            return;
+        }
+
+        // 2. Extract distinct roles (ignoring null/empty)
+        Set<String> roles = employees.stream()
+                .map(Employee::getRole)
+                .filter(Objects::nonNull)
+                .map(String::trim)
+                .filter(r -> !r.isEmpty())
+                .map(String::toLowerCase) // normalize case
+                .collect(Collectors.toCollection(TreeSet::new)); // sorted & unique
+
+        // 3. Print results
+        if (roles.isEmpty()) {
+            System.out.println("⚠️ No roles found for employees.");
+        } else {
+            System.out.println("✅ Roles available in the system:");
+            roles.forEach(role -> System.out.println("   • " + Helper.capitalizeFirstLetter(role)));
+        }
+    }
+
 }

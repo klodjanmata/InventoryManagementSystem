@@ -1,17 +1,20 @@
 package Service;
 
-import Entity.Category;
-import Entity.Product;
-import Entity.Supplier;
+import Entity.*;
 import Repository.CategoryRepository;
 import Repository.ProductRepository;
+import Repository.SaleRepository;
 import Repository.SupplierRepository;
 import Util.Helper;
 import Util.Printer;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class ProductService {
 
@@ -20,8 +23,7 @@ public class ProductService {
     private SupplierService supplierService = new SupplierService();
     private CategoryRepository categoryRepository = new CategoryRepository();
     private CategoryService categoryService = new CategoryService();
-    private Supplier supplier = new Supplier();
-    private Category category = new Category();
+    private SaleRepository saleRepository = new SaleRepository();
 
     public ProductService() {
         this.productRepository = productRepository;
@@ -155,8 +157,41 @@ public class ProductService {
         }
     }
 
-    public Product getProductById(int id) {
-        return productRepository.findById(id);
+    public void updateProductStockIncremental() {
+        System.out.println("📦 Update Product Stock (Increment/Decrement)");
+
+        // 1. Show all products so user can choose
+        printAllProducts();
+        int productId = Helper.getIntFromUser("Enter Product ID");
+
+        Optional<Product> productOpt = Optional.ofNullable(productRepository.findById(productId));
+        if (productOpt.isEmpty()) {
+            System.out.println("❌ Product not found.");
+            return;
+        }
+
+        Product product = productOpt.get();
+
+        // 2. Ask for stock adjustment (can be positive or negative)
+        int adjustment = Helper.getIntFromUser("Enter stock adjustment (e.g., +10 or -5)");
+
+        int currentStock = product.getStock();
+        int newStock = currentStock + adjustment;
+
+        if (newStock < 0) {
+            System.out.println("❌ Stock cannot go below 0. Current stock: " + currentStock);
+            return;
+        }
+
+        // 3. Update stock
+        product.setStock(newStock);
+        productRepository.update(product);
+
+        // 4. Confirm update
+        System.out.println("✅ Stock updated for product: " + product.getName() +
+                " | Previous Stock: " + currentStock +
+                " | Adjustment: " + adjustment +
+                " | New Stock: " + newStock);
     }
 
     public void printAllProducts() {
@@ -287,4 +322,436 @@ public class ProductService {
             Printer.printProducts(filtered);
         }
     }
+
+    public void printProductsByPopularity() {
+        System.out.println("⭐ Filter Products by Popularity (Units Sold)");
+
+        // 1. Get all sales
+        List<Sale> sales = saleRepository.findAll();
+        if (sales.isEmpty()) {
+            System.out.println("❌ No sales found.");
+            return;
+        }
+
+        // 2. Flatten all sale items
+        List<SaleItem> allItems = sales.stream()
+                .filter(s -> s.getItems() != null)
+                .flatMap(s -> s.getItems().stream())
+                .toList();
+
+        if (allItems.isEmpty()) {
+            System.out.println("⚠️ No sale items found.");
+            return;
+        }
+
+        // 3. Group by product and sum quantities
+        Map<Product, Integer> totalsByProduct = allItems.stream()
+                .filter(item -> item.getProduct() != null)
+                .collect(Collectors.groupingBy(
+                        SaleItem::getProduct,
+                        Collectors.summingInt(SaleItem::getQuantity)
+                ));
+
+        // 4. Sort products by total units sold (descending)
+        List<Map.Entry<Product, Integer>> sorted = totalsByProduct.entrySet().stream()
+                .sorted((e1, e2) -> Integer.compare(e2.getValue(), e1.getValue()))
+                .toList();
+
+        // 5. Print results
+        System.out.println("📊 Products ranked by popularity (units sold):");
+        int rank = 1;
+        for (Map.Entry<Product, Integer> entry : sorted) {
+            Product product = entry.getKey();
+            int totalQty = entry.getValue();
+            System.out.println(rank + ". 📦 " + product.getName() +
+                    " | Units Sold: " + totalQty);
+            rank++;
+        }
+    }
+
+    public void printProductsByLastSaleDate() {
+        System.out.println("📅 Filter Products by Last Sale Date");
+
+        // 1. Ask user how many days back to consider
+        int days = Helper.getIntFromUser("Enter number of days (e.g., 30 for last month)");
+
+        if (days <= 0) {
+            System.out.println("❌ Invalid number of days.");
+            return;
+        }
+
+        LocalDate cutoffDate = LocalDate.now().minusDays(days);
+
+        // 2. Get all sales
+        List<Sale> sales = saleRepository.findAll();
+        if (sales.isEmpty()) {
+            System.out.println("⚠️ No sales found.");
+            return;
+        }
+
+        // 3. Map product → last sale date
+        Map<Product, LocalDate> lastSaleByProduct = new HashMap<>();
+
+        for (Sale sale : sales) {
+            if (sale.getSaleDate() == null || sale.getItems() == null) continue;
+
+            for (SaleItem item : sale.getItems()) {
+                Product product = item.getProduct();
+                if (product == null) continue;
+
+                LocalDate saleDate = sale.getSaleDate();
+                lastSaleByProduct.merge(product, saleDate,
+                        (oldDate, newDate) -> newDate.isAfter(oldDate) ? newDate : oldDate);
+            }
+        }
+
+        // 4. Filter products with last sale date after cutoff
+        List<Map.Entry<Product, LocalDate>> recentSales = lastSaleByProduct.entrySet().stream()
+                .filter(e -> !e.getValue().isBefore(cutoffDate))
+                .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue())) // newest first
+                .toList();
+
+        // 5. Print results
+        if (recentSales.isEmpty()) {
+            System.out.println("⚠️ No products sold in the last " + days + " days.");
+        } else {
+            System.out.println("✅ Products sold in the last " + days + " days:");
+            for (Map.Entry<Product, LocalDate> entry : recentSales) {
+                System.out.println("📦 " + entry.getKey().getName() +
+                        " | Last Sale: " + entry.getValue());
+            }
+        }
+    }
+
+    public void printSlowMovingProducts() {
+        System.out.println("🐢 Filter Slow-Moving Products (Not Sold in Last X Days)");
+
+        // 1. Ask user how many days back to check
+        int days = Helper.getIntFromUser("Enter number of days (e.g., 60 for last 2 months)");
+
+        if (days <= 0) {
+            System.out.println("❌ Invalid number of days.");
+            return;
+        }
+
+        LocalDate cutoffDate = LocalDate.now().minusDays(days);
+
+        // 2. Get all products
+        List<Product> products = productRepository.findAll();
+        if (products.isEmpty()) {
+            System.out.println("⚠️ No products found.");
+            return;
+        }
+
+        // 3. Get all sales
+        List<Sale> sales = saleRepository.findAll();
+
+        // 4. Map product → last sale date
+        Map<Product, LocalDate> lastSaleByProduct = new HashMap<>();
+
+        for (Sale sale : sales) {
+            if (sale.getSaleDate() == null || sale.getItems() == null) continue;
+
+            for (SaleItem item : sale.getItems()) {
+                Product product = item.getProduct();
+                if (product == null) continue;
+
+                LocalDate saleDate = sale.getSaleDate();
+                lastSaleByProduct.merge(product, saleDate,
+                        (oldDate, newDate) -> newDate.isAfter(oldDate) ? newDate : oldDate);
+            }
+        }
+
+        // 5. Filter products with no sales OR last sale before cutoff
+        List<Product> slowMoving = products.stream()
+                .filter(p -> {
+                    LocalDate lastSale = lastSaleByProduct.get(p);
+                    return lastSale == null || lastSale.isBefore(cutoffDate);
+                })
+                .toList();
+
+        // 6. Print results
+        if (slowMoving.isEmpty()) {
+            System.out.println("✅ All products have been sold in the last " + days + " days.");
+        } else {
+            System.out.println("🐢 Slow-moving products (not sold in last " + days + " days):");
+            Printer.printProducts(slowMoving);
+        }
+    }
+
+    public void printProductsByCategoryAndPriceRange() {
+        System.out.println("🏷️💲 Filter Products by Category + Price Range");
+
+        // 1. Show all categories so user can choose
+        categoryService.printAllCategories();
+        Long categoryId = Helper.getLongFromUser("Enter Category ID");
+
+        Optional<Category> categoryOpt = Optional.ofNullable(categoryRepository.findById(categoryId));
+        if (categoryOpt.isEmpty()) {
+            System.out.println("❌ Category not found. Aborting filter.");
+            return;
+        }
+        Category category = categoryOpt.get();
+
+        // 2. Ask for price range
+        double minPrice = Helper.getDoubleFromUser("Enter minimum price");
+        double maxPrice = Helper.getDoubleFromUser("Enter maximum price");
+
+        if (minPrice > maxPrice) {
+            System.out.println("❌ Minimum price cannot be greater than maximum price.");
+            return;
+        }
+
+        // 3. Get all products
+        List<Product> products = productRepository.findAll();
+        if (products.isEmpty()) {
+            System.out.println("⚠️ No products found.");
+            return;
+        }
+
+        // 4. Filter by category AND price range
+        List<Product> filtered = products.stream()
+                .filter(p -> p.getCategory() != null && p.getCategory().getId() == category.getId())
+                .filter(p -> p.getPrice() != null &&
+                        p.getPrice().doubleValue() >= minPrice &&
+                        p.getPrice().doubleValue() <= maxPrice)
+                .toList();
+
+        // 5. Print results
+        if (filtered.isEmpty()) {
+            System.out.println("⚠️ No products found in category '" + category.getName() +
+                    "' within price range " + minPrice + " - " + maxPrice);
+        } else {
+            System.out.println("✅ Products in category '" + category.getName() +
+                    "' within price range " + minPrice + " - " + maxPrice + ":");
+            Printer.printProducts(filtered);
+        }
+    }
+
+    public void printProductsBySupplierAndLowStock() {
+        System.out.println("🚚📉 Filter Products by Supplier + Low Stock");
+
+        // 1. Show all suppliers so user can choose
+        supplierService.printAllSuppliers();
+        int supplierId = Helper.getIntFromUser("Enter Supplier ID");
+
+        Optional<Supplier> supplierOpt = Optional.ofNullable(supplierRepository.findById(supplierId));
+        if (supplierOpt.isEmpty()) {
+            System.out.println("❌ Supplier not found. Aborting filter.");
+            return;
+        }
+        Supplier supplier = supplierOpt.get();
+
+        // 2. Ask for low stock threshold
+        int threshold = Helper.getIntFromUser("Enter stock threshold (e.g., 5)");
+
+        if (threshold < 0) {
+            System.out.println("❌ Threshold cannot be negative.");
+            return;
+        }
+
+        // 3. Get all products
+        List<Product> products = productRepository.findAll();
+        if (products.isEmpty()) {
+            System.out.println("⚠️ No products found.");
+            return;
+        }
+
+        // 4. Filter by supplier AND stock below threshold
+        List<Product> filtered = products.stream()
+                .filter(p -> p.getSupplier() != null && p.getSupplier().getId() == supplier.getId())
+                .filter(p -> p.getStock() <= threshold)
+                .toList();
+
+        // 5. Print results
+        if (filtered.isEmpty()) {
+            System.out.println("✅ No low-stock products found for supplier: " + supplier.getName());
+        } else {
+            System.out.println("⚠️ Low-stock products from supplier: " + supplier.getName());
+            Printer.printProducts(filtered);
+        }
+    }
+
+    public void printPopularLowStockProducts() {
+        System.out.println("⭐📉 Filter Products by Popularity + Low Stock");
+
+        // 1. Ask for low stock threshold
+        int threshold = Helper.getIntFromUser("Enter stock threshold (e.g., 5)");
+
+        if (threshold < 0) {
+            System.out.println("❌ Threshold cannot be negative.");
+            return;
+        }
+
+        // 2. Get all sales
+        List<Sale> sales = saleRepository.findAll();
+        if (sales.isEmpty()) {
+            System.out.println("⚠️ No sales found.");
+            return;
+        }
+
+        // 3. Flatten all sale items
+        List<SaleItem> allItems = sales.stream()
+                .filter(s -> s.getItems() != null)
+                .flatMap(s -> s.getItems().stream())
+                .toList();
+
+        if (allItems.isEmpty()) {
+            System.out.println("⚠️ No sale items found.");
+            return;
+        }
+
+        // 4. Group by product and sum quantities sold
+        Map<Product, Integer> totalsByProduct = allItems.stream()
+                .filter(item -> item.getProduct() != null)
+                .collect(Collectors.groupingBy(
+                        SaleItem::getProduct,
+                        Collectors.summingInt(SaleItem::getQuantity)
+                ));
+
+        // 5. Filter products that are low in stock
+        List<Map.Entry<Product, Integer>> popularLowStock = totalsByProduct.entrySet().stream()
+                .filter(e -> e.getKey().getStock() <= threshold)
+                .sorted((e1, e2) -> Integer.compare(e2.getValue(), e1.getValue())) // sort by popularity
+                .toList();
+
+        // 6. Print results
+        if (popularLowStock.isEmpty()) {
+            System.out.println("✅ No popular products are currently low in stock.");
+        } else {
+            System.out.println("⚠️ Popular products running low (stock ≤ " + threshold + "):");
+            int rank = 1;
+            for (Map.Entry<Product, Integer> entry : popularLowStock) {
+                Product product = entry.getKey();
+                int totalSold = entry.getValue();
+                System.out.println(rank + ". 📦 " + product.getName() +
+                        " | Units Sold: " + totalSold +
+                        " | Current Stock: " + product.getStock());
+                rank++;
+            }
+        }
+    }
+
+    public void printTop5ProductsByRevenue() {
+        System.out.println("💰 Top 5 Products by Revenue (including ties)");
+
+        // 1. Get all sales
+        List<Sale> sales = saleRepository.findAll();
+        if (sales.isEmpty()) {
+            System.out.println("❌ No sales found.");
+            return;
+        }
+
+        // 2. Flatten all sale items
+        List<SaleItem> allItems = sales.stream()
+                .filter(s -> s.getItems() != null)
+                .flatMap(s -> s.getItems().stream())
+                .toList();
+
+        if (allItems.isEmpty()) {
+            System.out.println("⚠️ No sale items found.");
+            return;
+        }
+
+        // 3. Group by product and sum revenue (price × quantity)
+        Map<Product, BigDecimal> revenueByProduct = allItems.stream()
+                .filter(item -> item.getProduct() != null && item.getProduct().getPrice() != null)
+                .collect(Collectors.groupingBy(
+                        SaleItem::getProduct,
+                        Collectors.reducing(BigDecimal.ZERO,
+                                item -> item.getProduct().getPrice()
+                                        .multiply(BigDecimal.valueOf(item.getQuantity())),
+                                BigDecimal::add)
+                ));
+
+        // 4. Sort products by revenue (descending)
+        List<Map.Entry<Product, BigDecimal>> sorted = revenueByProduct.entrySet().stream()
+                .sorted((e1, e2) -> e2.getValue().compareTo(e1.getValue()))
+                .toList();
+
+        if (sorted.isEmpty()) {
+            System.out.println("⚠️ No products with revenue found.");
+            return;
+        }
+
+        // 5. Determine cutoff (5th place revenue)
+        int limit = Math.min(5, sorted.size());
+        BigDecimal cutoffValue = sorted.get(limit - 1).getValue();
+
+        // 6. Include all products with revenue >= cutoff
+        List<Map.Entry<Product, BigDecimal>> topWithTies = sorted.stream()
+                .filter(e -> e.getValue().compareTo(cutoffValue) >= 0)
+                .toList();
+
+        // 7. Print results
+        int rank = 1;
+        for (Map.Entry<Product, BigDecimal> entry : topWithTies) {
+            Product product = entry.getKey();
+            BigDecimal revenue = entry.getValue();
+            System.out.println(rank + ". 📦 " + product.getName() +
+                    " | Total Revenue: " + revenue + " EUR");
+            rank++;
+        }
+    }
+
+    public void printTop5BestSellingProducts() {
+        System.out.println("🏆 Top 5 Best-Selling Products (including ties)");
+
+        // 1. Get all sales
+        List<Sale> sales = saleRepository.findAll();
+        if (sales.isEmpty()) {
+            System.out.println("❌ No sales found.");
+            return;
+        }
+
+        // 2. Flatten all sale items
+        List<SaleItem> allItems = sales.stream()
+                .filter(s -> s.getItems() != null)
+                .flatMap(s -> s.getItems().stream())
+                .toList();
+
+        if (allItems.isEmpty()) {
+            System.out.println("⚠️ No sale items found.");
+            return;
+        }
+
+        // 3. Group by product and sum quantities sold
+        Map<Product, Integer> totalsByProduct = allItems.stream()
+                .filter(item -> item.getProduct() != null)
+                .collect(Collectors.groupingBy(
+                        SaleItem::getProduct,
+                        Collectors.summingInt(SaleItem::getQuantity)
+                ));
+
+        // 4. Sort products by total units sold (descending)
+        List<Map.Entry<Product, Integer>> sorted = totalsByProduct.entrySet().stream()
+                .sorted((e1, e2) -> Integer.compare(e2.getValue(), e1.getValue()))
+                .toList();
+
+        if (sorted.isEmpty()) {
+            System.out.println("⚠️ No products found.");
+            return;
+        }
+
+        // 5. Determine cutoff (5th place value)
+        int limit = Math.min(5, sorted.size());
+        int cutoffValue = sorted.get(limit - 1).getValue();
+
+        // 6. Include all products with sales >= cutoffValue
+        List<Map.Entry<Product, Integer>> topWithTies = sorted.stream()
+                .filter(e -> e.getValue() >= cutoffValue)
+                .toList();
+
+        // 7. Print results
+        int rank = 1;
+        for (Map.Entry<Product, Integer> entry : topWithTies) {
+            Product product = entry.getKey();
+            int totalQty = entry.getValue();
+            System.out.println(rank + ". 📦 " + product.getName() +
+                    " | Units Sold: " + totalQty);
+            rank++;
+        }
+    }
+
+
 }

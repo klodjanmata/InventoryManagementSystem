@@ -82,4 +82,94 @@ public class CategoryService {
             System.out.println("❌ No customer found with ID " + categoryId);
         }
     }
+
+    public void filterCategoriesByName() {
+        System.out.println("🔎 Filter Categories by Name");
+
+        // 1. Ask user for search keyword
+        String keyword = Helper.getStringFromUser("Enter category name or part of it");
+        if (keyword == null || keyword.trim().isEmpty()) {
+            System.out.println("❌ Invalid input. Please enter a valid name.");
+            return;
+        }
+
+        // 2. Get all categories
+        List<Category> categories = categoryRepo.findAll();
+        if (categories.isEmpty()) {
+            System.out.println("⚠️ No categories found in the system.");
+            return;
+        }
+
+        // 3. Filter by name (case-insensitive, partial match)
+        String search = keyword.trim().toLowerCase();
+        List<Category> filtered = categories.stream()
+                .filter(c -> c.getName() != null && c.getName().toLowerCase().contains(search))
+                .toList();
+
+        // 4. Print results
+        if (filtered.isEmpty()) {
+            System.out.println("⚠️ No categories found with name containing: " + keyword);
+        } else {
+            System.out.println("✅ Categories matching name '" + keyword + "':");
+            Printer.printCategories(filtered);
+        }
+    }
+
+    public void filterCategoriesByDescriptionKeyword() {
+        System.out.println("📝 Filter Categories by Description Keyword");
+
+        // 1. Ask user for keyword
+        String keyword = Helper.getStringFromUser("Enter keyword to search in category descriptions");
+        if (keyword == null || keyword.trim().isEmpty()) {
+            System.out.println("❌ Invalid input. Please enter a valid keyword.");
+            return;
+        }
+
+        // 2. Get all categories
+        List<Category> categories = categoryRepo.findAll();
+        if (categories.isEmpty()) {
+            System.out.println("⚠️ No categories found in the system.");
+            return;
+        }
+
+        // 3. Filter by description keyword (case-insensitive)
+        String search = keyword.trim().toLowerCase();
+        List<Category> filtered = categories.stream()
+                .filter(c -> c.getDescription() != null && c.getDescription().toLowerCase().contains(search))
+                .toList();
+
+        // 4. Print results
+        if (filtered.isEmpty()) {
+            System.out.println("⚠️ No categories found with description containing: " + keyword);
+        } else {
+            System.out.println("✅ Categories with description containing '" + keyword + "':");
+            Printer.printCategories(filtered);
+        }
+    }
+
+    public void filterCategoriesByMissingDescription() {
+        System.out.println("⚠️ Filter Categories Missing Description");
+
+        // 1. Get all categories
+        List<Category> categories = categoryRepo.findAll();
+        if (categories.isEmpty()) {
+            System.out.println("⚠️ No categories found in the system.");
+            return;
+        }
+
+        // 2. Filter categories with missing or empty description
+        List<Category> filtered = categories.stream()
+                .filter(c -> c.getDescription() == null || c.getDescription().trim().isEmpty())
+                .toList();
+
+        // 3. Print results
+        if (filtered.isEmpty()) {
+            System.out.println("✅ All categories have descriptions filled in.");
+        } else {
+            System.out.println("⚠️ Categories missing description:");
+            Printer.printCategories(filtered);
+        }
+    }
+
+
 }
